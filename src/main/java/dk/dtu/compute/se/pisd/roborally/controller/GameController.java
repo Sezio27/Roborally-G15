@@ -228,13 +228,18 @@ public class GameController {
 
     // TODO: V2
     public void moveForward(@NotNull Player player) {
-        Space curPos = player.getSpace();
-        if (player != null && player.board == board && curPos != null) {
+        if (player.board == board) {
+            Space curPos = player.getSpace();
             Heading heading = player.getHeading();
 
 
             Space target = board.getNeighbour(curPos, heading);
             if (target != null) {
+                try {
+                    moveToSpace(player, target, heading);
+                } catch (ImpossibleMoveException e) {
+
+                }
                 // XXX note that this removes an other player from the space, when there
                 //     is another player on the target. Eventually, this needs to be
                 //     implemented in a way so that other players are pushed away!
@@ -276,6 +281,28 @@ public class GameController {
         }
     }
 
+    void moveToSpace(@NotNull Player player, @NotNull Space space, @NotNull Heading heading) throws ImpossibleMoveException {
+        assert board.getNeighbour(player.getSpace(), heading) == space; // make sure the move to here is possible in principle
+        Player other = space.getPlayer();
+        if (other != null){
+            Space target = board.getNeighbour(space, heading);
+            if (target != null) {
+                // XXX Note that there might be additional problems with
+                //     infinite recursion here (in some special cases)!
+                //     We will come back to that!
+                moveToSpace(other, target, heading);
+
+                // Note that we do NOT embed the above statement in a try catch block, since
+                // the thrown exception is supposed to be passed on to the caller
+
+                assert target.getPlayer() == null : target; // make sure target is free now
+            } else {
+                throw new ImpossibleMoveException(player, space, heading);
+            }
+        }
+        player.setSpace(space);
+    }
+
     /**
      * A method called when no corresponding controller operation is implemented yet. This
      * should eventually be removed.
@@ -283,6 +310,20 @@ public class GameController {
     public void notImplemented() {
         // XXX just for now to indicate that the actual method is not yet implemented
         assert false;
+    }
+
+    class ImpossibleMoveException extends Exception {
+
+        private Player player;
+        private Space space;
+        private Heading heading;
+
+        public ImpossibleMoveException(Player player, Space space, Heading heading) {
+            super("Move impossible");
+            this.player = player;
+            this.space = space;
+            this.heading = heading;
+        }
     }
 
 }
