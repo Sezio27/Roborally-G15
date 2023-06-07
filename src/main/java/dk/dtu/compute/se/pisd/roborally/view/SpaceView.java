@@ -22,16 +22,19 @@
 package dk.dtu.compute.se.pisd.roborally.view;
 
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
-import dk.dtu.compute.se.pisd.roborally.model.Heading;
-import dk.dtu.compute.se.pisd.roborally.model.Player;
-import dk.dtu.compute.se.pisd.roborally.model.Space;
+import dk.dtu.compute.se.pisd.roborally.model.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.StrokeLineCap;
 import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Field;
+import java.net.URISyntaxException;
 
 /**
  * ...
@@ -73,7 +76,6 @@ public class SpaceView extends StackPane implements ViewObserver {
     }
 
     private void updatePlayer() {
-        this.getChildren().clear();
 
         Player player = space.getPlayer();
         if (player != null) {
@@ -122,18 +124,50 @@ public class SpaceView extends StackPane implements ViewObserver {
                         break;
                 }
 
-                line.setFill(Color.GREY);
+                line.setFill(Color.DARKGOLDENROD);
                 this.getChildren().add(line);
 
             }
         }
     }
 
+    private void updateFieldActions() {
+        if (space != null && !space.getActions().isEmpty()) {
+            for (FieldAction action: space.getActions()) {
+
+                if (action instanceof ConveyorBelt) {
+                        String heading = ((ConveyorBelt) action).getHeading().toString();
+                        putIcon("conveyor" + heading + ".png");
+                }
+
+                if (action instanceof Checkpoint) {
+                    int number = ((Checkpoint) action).getNumber();
+                    putIcon("checkpoint" + number + ".png");
+                }
+
+                //Continue like this
+            }
+        }
+    }
+
+    private ImageView putIcon(String name) {
+        Image icon = new Image(SpaceView.class.getClassLoader().getResource("assets/"+name).toString());
+        ImageView imgView = new ImageView(icon);
+        imgView.setImage(icon);
+        imgView.setFitHeight(SPACE_HEIGHT);
+        imgView.setFitWidth(SPACE_WIDTH);
+        imgView.setVisible(true);
+        this.getChildren().add(imgView);
+        return imgView;
+    }
+
     @Override
     public void updateView(Subject subject) {
         if (subject == this.space) {
-            updatePlayer();
+            this.getChildren().clear();
+            updateFieldActions();
             updateWalls();
+            updatePlayer();
         }
     }
 

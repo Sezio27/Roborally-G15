@@ -74,6 +74,10 @@ public class Board extends Subject {
         ConveyorBelt belt = new ConveyorBelt();
         belt.setHeading(Heading.SOUTH);
         spaces[4][1].addFieldAction(belt);
+        spaces[7][3].addFieldAction(new Checkpoint(1));
+        spaces[5][2].addFieldAction(new Checkpoint(2));
+        spaces[6][3].addFieldAction(new Checkpoint(3));
+        spaces[6][4].addFieldAction(new Checkpoint(4));
 
 
         this.stepMode = false;
