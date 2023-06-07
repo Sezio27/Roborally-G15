@@ -91,10 +91,49 @@ public class SpaceView extends StackPane implements ViewObserver {
         }
     }
 
+    private void updateWalls() {
+        double wallWidth = SPACE_WIDTH / 7;
+        double translateVal = (SPACE_WIDTH - wallWidth) / 2;
+        double lineLength = SPACE_WIDTH;
+
+        if (space != null && !space.getWalls().isEmpty()) {
+            System.out.println("called");
+            for (Heading wall: space.getWalls()) {
+
+                Polygon line = new Polygon(0.0, 0.0,
+                       lineLength, 0.0,
+                       lineLength, wallWidth,
+                        0.0, wallWidth);
+
+                switch (wall) {
+                    case NORTH:
+                        line.setTranslateY(-translateVal);
+                        break;
+                    case SOUTH:
+                        line.setTranslateY(translateVal);
+                        break;
+                    case EAST:
+                        line.setTranslateX(translateVal);
+                        line.setRotate(90*wall.ordinal() % 360);
+                        break;
+                    case WEST:
+                        line.setTranslateX(-translateVal);
+                        line.setRotate(90*wall.ordinal() % 360);
+                        break;
+                }
+
+                line.setFill(Color.GREY);
+                this.getChildren().add(line);
+
+            }
+        }
+    }
+
     @Override
     public void updateView(Subject subject) {
         if (subject == this.space) {
             updatePlayer();
+            updateWalls();
         }
     }
 

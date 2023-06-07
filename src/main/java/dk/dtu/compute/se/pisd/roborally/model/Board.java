@@ -68,6 +68,14 @@ public class Board extends Subject {
                 spaces[x][y] = space;
             }
         }
+
+        //Test wall - to be deleted
+        spaces[3][1].addWall(Heading.WEST);
+        ConveyorBelt belt = new ConveyorBelt();
+        belt.setHeading(Heading.SOUTH);
+        spaces[4][1].addFieldAction(belt);
+
+
         this.stepMode = false;
     }
 
@@ -100,6 +108,10 @@ public class Board extends Subject {
 
     public int getPlayersNumber() {
         return players.size();
+    }
+
+    public List<Player> getPlayers() {
+        return players;
     }
 
     public void addPlayer(@NotNull Player player) {

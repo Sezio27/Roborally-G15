@@ -160,6 +160,13 @@ public class GameController {
                     }
                     executeCommand(currentPlayer, command);
                 }
+
+                for (Player player: board.getPlayers()) {
+                    for (FieldAction action: player.getSpace().getActions()) {
+                        action.doAction(this, player.getSpace());
+                    }
+                }
+
                 moveToNextProgramCard(currentPlayer);
             } else {
                 // this should not happen
@@ -194,7 +201,7 @@ public class GameController {
 
             switch (command) {
                 case FORWARD:
-                    this.moveForward(player);
+                    this.moveForward(player, player.getHeading());
                     break;
                 case RIGHT:
                     this.turnRight(player);
@@ -227,32 +234,55 @@ public class GameController {
     }
 
     // TODO: V2
-    public void moveForward(@NotNull Player player) {
+    public void moveForward(@NotNull Player player, Heading heading) {
         if (player.board == board) {
-            Space curPos = player.getSpace();
-            Heading heading = player.getHeading();
+            Space source = player.getSpace();
+            Space destination = board.getNeighbour(source, heading);
 
-
-            Space target = board.getNeighbour(curPos, heading);
-            if (target != null) {
+            if (destination != null) {
                 try {
-                    moveToSpace(player, target, heading);
+                    moveToSpace(player, source, destination, heading, 1);
                 } catch (ImpossibleMoveException e) {
-
+                    System.out.println(e);
                 }
-                // XXX note that this removes an other player from the space, when there
-                //     is another player on the target. Eventually, this needs to be
-                //     implemented in a way so that other players are pushed away!
-                target.setPlayer(player);
-            }
 
+            }
         }
+    }
+
+
+    // *Include in report*
+    private void moveToSpace(@NotNull Player player, @NotNull Space source, @NotNull Space destination, @NotNull Heading heading, int moveCount) throws ImpossibleMoveException {
+        assert board.getNeighbour(player.getSpace(), heading) == destination; // make sure the move to here is possible in principle
+
+
+        if (source.getWalls().contains(heading) || destination.getWalls().contains(heading.opposing())) return;
+
+        Player other = destination.getPlayer();
+        if (other != null ){
+
+            Space otherDestination = board.getNeighbour(destination, heading);
+            if (moveCount >= board.getPlayersNumber() || otherDestination != null && !otherDestination.getWalls().contains(heading.opposing())) {
+                // XXX Note that there might be additional problems with
+                //     infinite recursion here (in some special cases)!
+                //     We will come back to that!
+                moveToSpace(other, destination, otherDestination, heading, moveCount+1);
+
+                // Note that we do NOT embed the above statement in a try catch block, since
+                // the thrown exception is supposed to be passed on to the caller
+
+                assert otherDestination.getPlayer() == null : otherDestination; // make sure target is free now
+            } else {
+                throw new ImpossibleMoveException(player, destination, heading);
+            }
+        }
+        player.setSpace(destination);
     }
 
     // TODO: V2
     public void fastForward(@NotNull Player player) {
-        moveForward(player);
-        moveForward(player);
+        moveForward(player, player.getHeading());
+        moveForward(player, player.getHeading());
     }
 
     // TODO: V2
@@ -281,27 +311,7 @@ public class GameController {
         }
     }
 
-    void moveToSpace(@NotNull Player player, @NotNull Space space, @NotNull Heading heading) throws ImpossibleMoveException {
-        assert board.getNeighbour(player.getSpace(), heading) == space; // make sure the move to here is possible in principle
-        Player other = space.getPlayer();
-        if (other != null){
-            Space target = board.getNeighbour(space, heading);
-            if (target != null) {
-                // XXX Note that there might be additional problems with
-                //     infinite recursion here (in some special cases)!
-                //     We will come back to that!
-                moveToSpace(other, target, heading);
 
-                // Note that we do NOT embed the above statement in a try catch block, since
-                // the thrown exception is supposed to be passed on to the caller
-
-                assert target.getPlayer() == null : target; // make sure target is free now
-            } else {
-                throw new ImpossibleMoveException(player, space, heading);
-            }
-        }
-        player.setSpace(space);
-    }
 
     /**
      * A method called when no corresponding controller operation is implemented yet. This
