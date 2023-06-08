@@ -57,10 +57,15 @@ public class ConveyorBelt extends FieldAction {
 
     @Override
     public boolean doAction(@NotNull GameController gameController, @NotNull Space space) {
+
         target = gameController.board.getNeighbour(space, heading);
 
-        boolean reachable = !target.getWalls().contains(heading.opposing());
-        boolean notOccupied = target.getPlayer() == null;
-        return notOccupied && reachable;
+        if (target != null) {
+            boolean reachable = !target.getWalls().contains(heading.opposing());
+            boolean notOccupied = target.getPlayer() == null;
+            return notOccupied && reachable;
+        }
+
+        return false;
     }
 }

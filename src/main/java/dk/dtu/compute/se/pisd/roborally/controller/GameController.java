@@ -44,7 +44,6 @@ public class GameController {
     }
 
 
-
     /**
      * This is just some dummy controller operation to make a simple move to see something
      * happening on the board. This method should eventually be deleted!
@@ -69,6 +68,19 @@ public class GameController {
             }
         }
 
+    }
+
+    public void updateCheckpoint(@NotNull Player player, int number) {
+        player.updateCheckpoint();
+        System.out.println(player.getName() + " - new checkpoint: " + player.getCurrentCheckpoint());
+        if (board.getNumberOfCheckpoints() == number) {
+            handleWin(player);
+        }
+
+    }
+
+    public void handleWin(@NotNull Player player) {
+        System.out.println(player.getName() + " has won!");
     }
 
     // XXX: V2
@@ -159,7 +171,7 @@ public class GameController {
         //Determine all final destinations of players on conveyor belts
         for (Player player : players) {
             Space source = player.getSpace();
-            ConveyorBelt belt = source.getAction(ConveyorBelt.class);
+            ConveyorBelt belt = source.getActionType(ConveyorBelt.class);
 
             if (belt.doAction(this, source)) {
                 Space destination = belt.getTarget();
@@ -176,7 +188,6 @@ public class GameController {
                     player.setSpace(destination);
                 });
 
-
     }
 
 
@@ -187,20 +198,16 @@ public class GameController {
 
         for (Player player : board.getPlayers()) {
             Space space = player.getSpace();
-            List<FieldAction> fieldActions = space.getActions();
 
-            if (!fieldActions.isEmpty()) {
-
-                for (FieldAction action : fieldActions) {
-
-                    if (action instanceof ConveyorBelt) playersOnConveyors.add(player);
+            FieldAction action = space.getAction();
+            if (action != null) {
 
 
-                    if (action.doAction(this, space)) {
-                        //Add other action cases here
+                //Special case for conveyors, must be handled separately
+                if (action instanceof ConveyorBelt) {
+                    playersOnConveyors.add(player);
+                } else action.doAction(this, space);
 
-                    }
-                }
             }
         }
 
@@ -226,12 +233,7 @@ public class GameController {
                     executeCommand(currentPlayer, command);
                 }
 
-                int nextPlayerNumber = board.getPlayerNumber(currentPlayer) + 1;
-                if (nextPlayerNumber < board.getPlayersNumber()) {
-                    board.setCurrentPlayer(board.getPlayer(nextPlayerNumber));
-                } else {
-                    finishRegisterRound(step);
-                }
+                finishCommand();
 
 
             } else {
@@ -244,15 +246,20 @@ public class GameController {
         }
     }
 
-    private void finishRegisterRound(int step) {
-        step++;
-        if (step < Player.NO_REGISTERS) {
-            executeFieldActions();
-            makeProgramFieldsVisible(step);
-            board.setStep(step);
-            board.setCurrentPlayer(board.getPlayer(0));
+    private void finishCommand() {
+        int nextPlayerNumber = board.getPlayerNumber(board.getCurrentPlayer()) + 1;
+        if (nextPlayerNumber < board.getPlayersNumber()) {
+            board.setCurrentPlayer(board.getPlayer(nextPlayerNumber));
         } else {
-            startProgrammingPhase();
+            int nextStep = board.getStep() + 1;
+            if (nextStep < Player.NO_REGISTERS) {
+                executeFieldActions();
+                makeProgramFieldsVisible(nextStep);
+                board.setStep(nextStep);
+                board.setCurrentPlayer(board.getPlayer(0));
+            } else {
+                startProgrammingPhase();
+            }
         }
     }
 
@@ -285,8 +292,7 @@ public class GameController {
         if (player.board == board && player == board.getCurrentPlayer()) {
             board.setPhase(Phase.ACTIVATION);
             executeCommand(player, option);
-            finishRegisterRound(board.getStep());
-
+            finishCommand();
 
             //Automatic execution continues after interactive map has been executed
             if (!board.isStepMode() && board.getPhase() == Phase.ACTIVATION) {
@@ -303,7 +309,8 @@ public class GameController {
 
             if (destination != null) {
                 try {
-                    moveToSpace(player, source, destination, heading, 1);
+                    int moveCount = 1; // Used to avoid possible cyclic infinite recursion
+                    moveToSpace(player, source, destination, heading, moveCount);
                 } catch (ImpossibleMoveException e) {
                     System.out.println(e);
                 }
@@ -311,7 +318,6 @@ public class GameController {
             }
         }
     }
-
 
     // *Include in report*
     private void moveToSpace(@NotNull Player player, @NotNull Space source, @NotNull Space destination, @NotNull Heading heading, int moveCount) throws ImpossibleMoveException {
@@ -325,9 +331,7 @@ public class GameController {
 
             Space otherDestination = board.getNeighbour(destination, heading);
             if (moveCount >= board.getPlayersNumber() || otherDestination != null && !otherDestination.getWalls().contains(heading.opposing())) {
-                // XXX Note that there might be additional problems with
-                //     infinite recursion here (in some special cases)!
-                //     We will come back to that!
+
                 moveToSpace(other, destination, otherDestination, heading, moveCount + 1);
 
 
@@ -336,7 +340,9 @@ public class GameController {
                 throw new ImpossibleMoveException(player, destination, heading);
             }
         }
+
         player.setSpace(destination);
+
     }
 
     // TODO: V2
@@ -370,7 +376,6 @@ public class GameController {
             return false;
         }
     }
-
 
 
     /**
