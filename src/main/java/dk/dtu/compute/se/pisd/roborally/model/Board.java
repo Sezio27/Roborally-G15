@@ -56,6 +56,8 @@ public class Board extends Subject {
 
     private boolean stepMode;
 
+    private int numberOfCheckpoints;
+
 
     public Board(int width, int height, @NotNull String boardName) {
         this.boardName = boardName;
@@ -68,14 +70,18 @@ public class Board extends Subject {
                 spaces[x][y] = space;
             }
         }
-
+        numberOfCheckpoints = 0;
         testBoard();
 
         this.stepMode = false;
 
     }
 
-
+    // To be deleted
+    private void putCheckPoint(Space space){
+        numberOfCheckpoints++;
+        space.setAction(new Checkpoint(numberOfCheckpoints));
+    }
 
 
     //TO BE DELETED
@@ -90,18 +96,18 @@ public class Board extends Subject {
         ConveyorBelt beltSouth = new ConveyorBelt(Heading.SOUTH);
         ConveyorBelt beltWest = new ConveyorBelt(Heading.WEST);
         ConveyorBelt beltEast = new ConveyorBelt(Heading.EAST);
-        spaces[0][1].addFieldAction(beltSouth);
-        spaces[0][2].addFieldAction(beltSouth);
-        spaces[0][3].addFieldAction(beltSouth);
-        spaces[0][4].addFieldAction(beltEast);
-        spaces[1][4].addFieldAction(beltEast);
-        spaces[2][4].addFieldAction(beltEast);
+        spaces[0][1].setAction(beltSouth);
+        spaces[0][2].setAction(beltSouth);
+        spaces[0][3].setAction(beltSouth);
+        spaces[0][4].setAction(beltEast);
+        spaces[1][4].setAction(beltEast);
+        spaces[2][4].setAction(beltEast);
 
         //Checkpoints
-        spaces[7][3].addFieldAction(new Checkpoint(1));
-        spaces[5][2].addFieldAction(new Checkpoint(2));
-        spaces[6][3].addFieldAction(new Checkpoint(3));
-        spaces[6][4].addFieldAction(new Checkpoint(4));
+        putCheckPoint(spaces[1][2]);
+        putCheckPoint(spaces[3][1]);
+        putCheckPoint(spaces[3][4]);
+        putCheckPoint(spaces[5][6]);
 
     }
 
@@ -176,6 +182,8 @@ public class Board extends Subject {
             notifyChange();
         }
     }
+
+    public int getNumberOfCheckpoints() {return numberOfCheckpoints;}
 
     public int getStep() {
         return step;

@@ -132,6 +132,29 @@ public class SpaceView extends StackPane implements ViewObserver {
     }
 
     private void updateFieldActions() {
+        if (space != null) {
+
+            FieldAction action = space.getAction();
+
+            if (action != null) {
+                if (action instanceof ConveyorBelt) {
+                    String heading = ((ConveyorBelt) action).getHeading().toString();
+                    putIcon("conveyor" + heading + ".png");
+                }
+
+                if (action instanceof Checkpoint) {
+                    int number = ((Checkpoint) action).getNumber();
+                    putIcon("checkpoint" + number + ".png");
+                }
+
+                //Continue like this
+
+            }
+        }
+    }
+
+    /*
+    private void updateFieldActions() {
         if (space != null && !space.getActions().isEmpty()) {
             for (FieldAction action: space.getActions()) {
 
@@ -149,6 +172,7 @@ public class SpaceView extends StackPane implements ViewObserver {
             }
         }
     }
+     */
 
     private ImageView putIcon(String name) {
         Image icon = new Image(SpaceView.class.getClassLoader().getResource("assets/"+name).toString());

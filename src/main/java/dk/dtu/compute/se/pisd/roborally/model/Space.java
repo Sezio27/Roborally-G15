@@ -38,7 +38,10 @@ public class Space extends Subject {
 
     private List<Heading> walls = new ArrayList<>();
 
-    private List<FieldAction> actions = new ArrayList<>();
+    private FieldAction action;
+
+    // Currently not supporting multiple field actions on a single space
+    // private List<FieldAction> actions = new ArrayList<>();
     public final int x;
     public final int y;
 
@@ -83,6 +86,24 @@ public class Space extends Subject {
         }
     }
 
+    public void setAction(FieldAction action) {
+        this.action = action;
+    }
+
+    public FieldAction getAction() {
+        return action;
+    }
+
+    public <T extends FieldAction> T getActionType(Class<T> type) {
+        if (type.isInstance(action)) {
+            return type.cast(action);
+        } else {
+            return null;
+        }
+    }
+
+    /* Methods supporting multiple FieldActions
+
     public <T extends FieldAction> T getAction(Class<T> type) {
         return actions.stream()
                 .filter(type::isInstance)
@@ -102,6 +123,8 @@ public class Space extends Subject {
             notifyChange();
         }
     }
+
+     */
 
     void playerChanged() {
         // This is a minor hack; since some views that are registered with the space
