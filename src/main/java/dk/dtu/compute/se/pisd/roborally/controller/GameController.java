@@ -24,6 +24,11 @@ package dk.dtu.compute.se.pisd.roborally.controller;
 import dk.dtu.compute.se.pisd.roborally.model.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 /**
  * ...
  *
@@ -33,9 +38,27 @@ import org.jetbrains.annotations.NotNull;
 public class GameController {
 
     final public Board board;
+    private Map<Space, List<Space>> conveyorPaths = new HashMap<>();
+    private boolean stepFinished = false;
 
     public GameController(@NotNull Board board) {
         this.board = board;
+        calculateConveyorPaths();
+        printTest1();
+    }
+
+    private void printTest1() {
+        for (int i = 0; i < conveyorPaths.size(); i++) {
+            Space key = (Space) conveyorPaths.keySet().toArray()[i];
+            System.out.println(i);
+            System.out.println("Source: (" + key.x + ", " + key.y + ")");
+            System.out.print("Path:");
+            for (Space space : conveyorPaths.get(key)) {
+                System.out.print(" (" + space.x + ", " + space.y + ")");
+            }
+            System.out.println();
+            System.out.println();
+        }
     }
 
     /**
@@ -144,8 +167,105 @@ public class GameController {
         } while (board.getPhase() == Phase.ACTIVATION && !board.isStepMode());
     }
 
+    private List<Space> calculateConveyorPath(Player player, Space currentSpace, List<Space> pathAccumulator) {
+
+        pathAccumulator.add(currentSpace);
+
+        ConveyorBelt currentBelt = currentSpace.getConveyorBelt();
+
+        //If we reached the space at the end of the conveyor belt
+        if (currentBelt == null) {
+            return pathAccumulator;
+        }
+
+        //If belt has been visited by player then no action
+        if (currentBelt.visitedByPlayer(player)) {
+            return pathAccumulator;
+        }
+
+        // If action is possible recursively check target space
+        if (!currentBelt.doAction(this, currentSpace)) {
+            return pathAccumulator;
+        }
+        return calculateConveyorPath(player, currentBelt.getTarget(), pathAccumulator);
+
+    }
+
+    // Include in report
+    private void handleConveyorMove(List<Player> players) {
+
+        Map<Player, List<Space>> pathMap = new HashMap<>();
+
+        // Get path for each player
+        for (Player player : players) {
+            List<Space> path = calculateConveyorPath(player, player.getSpace(), new ArrayList<>());
+            pathMap.put(player, path);
+        }
+
+        // Iterate over the entries of pathMap
+        for (Map.Entry<Player, List<Space>> entry : pathMap.entrySet()) {
+            Player player = entry.getKey();
+            List<Space> path = entry.getValue();
+            Space finalDestination = path.get(path.size() - 1);
+
+            // Check if this player's final destination is unique
+            boolean isUnique = pathMap.values().stream()
+                    .filter(spaces -> spaces.get(spaces.size() - 1).equals(finalDestination))
+                    .count() == 1;
+
+            // Update player's position
+            if (isUnique) {
+
+                player.setSpace(finalDestination);
+
+                // Mark all conveyor spaces on path as visited, under the assumption that at most only the end space could not be a conveyor
+                if (finalDestination.getConveyorBelt() == null) {
+                    path.remove(finalDestination);
+                }
+                for (Space space : path) {
+                    space.getConveyorBelt().addVisitedPlayer(player);
+                }
+            }
+        }
+
+    }
+
+
+    //** Use in report**
+    private void executeFieldActions() {
+
+        List<Player> playersOnConveyors = new ArrayList<>();
+
+        for (Player player: board.getPlayers()) {
+            Space space = player.getSpace();
+            List<FieldAction> fieldActions = space.getActions();
+
+            if (!fieldActions.isEmpty()) {
+
+                for (FieldAction action : fieldActions) {
+
+                    if (action instanceof ConveyorBelt) {
+                        if (!((ConveyorBelt) action).visitedByPlayer(player)) playersOnConveyors.add(player);
+                    }
+
+                    if (action.doAction(this, space)) {
+                        //Add other action cases here
+
+                    }
+                }
+            }
+        }
+
+        if (!playersOnConveyors.isEmpty()) handleConveyorMove(playersOnConveyors);
+    }
+
     // XXX: V2
     private void executeNextStep() {
+        //** Use in report **
+        if (stepFinished) executeFieldActions();
+
+
+
         Player currentPlayer = board.getCurrentPlayer();
         if (board.getPhase() == Phase.ACTIVATION && currentPlayer != null) {
             int step = board.getStep();
@@ -161,13 +281,8 @@ public class GameController {
                     executeCommand(currentPlayer, command);
                 }
 
-                for (Player player: board.getPlayers()) {
-                    for (FieldAction action: player.getSpace().getActions()) {
-                        action.doAction(this, player.getSpace());
-                    }
-                }
-
                 moveToNextProgramCard(currentPlayer);
+
             } else {
                 // this should not happen
                 assert false;
@@ -181,8 +296,10 @@ public class GameController {
     private void moveToNextProgramCard(@NotNull Player currentPlayer) {
         int nextPlayerNumber = board.getPlayerNumber(currentPlayer) + 1;
         if (nextPlayerNumber < board.getPlayersNumber()) {
+            stepFinished = false;
             board.setCurrentPlayer(board.getPlayer(nextPlayerNumber));
         } else {
+            stepFinished = true;
             int step = board.getStep();
             step++;
             if (step < Player.NO_REGISTERS) {
@@ -268,8 +385,6 @@ public class GameController {
                 //     We will come back to that!
                 moveToSpace(other, destination, otherDestination, heading, moveCount+1);
 
-                // Note that we do NOT embed the above statement in a try catch block, since
-                // the thrown exception is supposed to be passed on to the caller
 
                 assert otherDestination.getPlayer() == null : otherDestination; // make sure target is free now
             } else {
@@ -309,6 +424,41 @@ public class GameController {
         } else {
             return false;
         }
+    }
+
+
+    // To be deleted
+    private void calculateConveyorPaths() {
+
+        // For each space that has a conveyor belt, calculate the conveyor path
+        Arrays.stream(board.getSpaces())
+                .flatMap(Arrays::stream)
+                .filter(space ->
+                        space.getActions().stream().anyMatch(action -> action instanceof ConveyorBelt))
+                .forEach(space -> {
+
+                    if (conveyorPaths.containsKey(space)) return;
+
+                    List<Space> path = new ArrayList<>();
+
+                    ConveyorBelt belt = space.getConveyorBelt();
+
+                    Space target = board.getNeighbour(space, belt.getHeading());
+
+                    //Build path
+                    path.add(target);
+                    while (target.getConveyorBelt() != null) {
+                        ConveyorBelt destConveyor = target.getConveyorBelt();
+                        target = board.getNeighbour(target, destConveyor.getHeading());
+                        path.add(target);
+                    }
+
+                    conveyorPaths.put(space, path);
+
+                    IntStream.range(1, path.size() - 1)
+                            .forEach(i -> conveyorPaths.put(path.get(i), path.subList(i + 1, path.size())));
+
+                });
     }
 
 

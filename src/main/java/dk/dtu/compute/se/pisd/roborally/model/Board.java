@@ -24,8 +24,8 @@ package dk.dtu.compute.se.pisd.roborally.model;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.IntStream;
 
 import static dk.dtu.compute.se.pisd.roborally.model.Phase.INITIALISATION;
 
@@ -33,7 +33,6 @@ import static dk.dtu.compute.se.pisd.roborally.model.Phase.INITIALISATION;
  * ...
  *
  * @author Ekkart Kindler, ekki@dtu.dk
- *
  */
 public class Board extends Subject {
 
@@ -57,30 +56,52 @@ public class Board extends Subject {
 
     private boolean stepMode;
 
+
     public Board(int width, int height, @NotNull String boardName) {
         this.boardName = boardName;
         this.width = width;
         this.height = height;
         spaces = new Space[width][height];
         for (int x = 0; x < width; x++) {
-            for(int y = 0; y < height; y++) {
+            for (int y = 0; y < height; y++) {
                 Space space = new Space(this, x, y);
                 spaces[x][y] = space;
             }
         }
 
-        //Test wall - to be deleted
+        testBoard();
+
+        this.stepMode = false;
+
+    }
+
+
+
+
+    //TO BE DELETED
+    private void testBoard() {
+
+        //Walls
         spaces[3][1].addWall(Heading.WEST);
-        ConveyorBelt belt = new ConveyorBelt();
-        belt.setHeading(Heading.SOUTH);
-        spaces[4][1].addFieldAction(belt);
+
+        //Conveyor Belts
+        ConveyorBelt beltNorth = new ConveyorBelt(Heading.NORTH);
+        ConveyorBelt beltSouth = new ConveyorBelt(Heading.SOUTH);
+        ConveyorBelt beltWest = new ConveyorBelt(Heading.WEST);
+        ConveyorBelt beltEast = new ConveyorBelt(Heading.EAST);
+        spaces[0][1].addFieldAction(beltSouth);
+        spaces[0][2].addFieldAction(beltSouth);
+        spaces[0][3].addFieldAction(beltSouth);
+        spaces[0][4].addFieldAction(beltEast);
+        spaces[1][4].addFieldAction(beltEast);
+        spaces[2][4].addFieldAction(beltEast);
+
+        //Checkpoints
         spaces[7][3].addFieldAction(new Checkpoint(1));
         spaces[5][2].addFieldAction(new Checkpoint(2));
         spaces[6][3].addFieldAction(new Checkpoint(3));
         spaces[6][4].addFieldAction(new Checkpoint(4));
 
-
-        this.stepMode = false;
     }
 
     public Board(int width, int height) {
@@ -191,7 +212,7 @@ public class Board extends Subject {
      * (no walls or obstacles in either of the involved spaces); otherwise,
      * null will be returned.
      *
-     * @param space the space for which the neighbour should be computed
+     * @param space   the space for which the neighbour should be computed
      * @param heading the heading of the neighbour
      * @return the space in the given direction; null if there is no (reachable) neighbour
      */
@@ -214,6 +235,10 @@ public class Board extends Subject {
         }
 
         return getSpace(x, y);
+    }
+
+    public Space[][] getSpaces() {
+        return spaces;
     }
 
     public String getStatusMessage() {

@@ -24,6 +24,9 @@ package dk.dtu.compute.se.pisd.roborally.model;
 import dk.dtu.compute.se.pisd.roborally.controller.GameController;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * ...
  *
@@ -32,7 +35,14 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ConveyorBelt extends FieldAction {
 
+    private List<Player> visitedPlayers = new ArrayList<>();
     private Heading heading;
+
+    private Space target;
+
+    public ConveyorBelt(Heading heading) {
+        this.heading = heading;
+    }
 
     public Heading getHeading() {
         return heading;
@@ -42,16 +52,27 @@ public class ConveyorBelt extends FieldAction {
         this.heading = heading;
     }
 
-    @Override
-    public boolean doAction(@NotNull GameController gameController, @NotNull Space space) {
-
-        Player player = space.getPlayer();
-
-        if (player != null || heading != null) {
-            gameController.moveForward(player, heading);
-        }
-
-        return true;
+    public void addVisitedPlayer(Player player) {
+        visitedPlayers.add(player);
     }
 
+    public boolean visitedByPlayer(Player player) {
+        return visitedPlayers.contains(player);
+    }
+
+    public void removeVisitedPlayer(Player player) {
+        visitedPlayers.remove(player);
+    }
+
+    public Space getTarget() {
+        return target;
+    };
+
+    @Override
+    public boolean doAction(@NotNull GameController gameController, @NotNull Space space) {
+        target = gameController.board.getNeighbour(space, heading);
+        boolean reachable = target != null;
+        boolean notOccupied = target.getPlayer() == null;
+        return notOccupied && reachable;
+    }
 }

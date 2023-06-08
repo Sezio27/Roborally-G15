@@ -44,6 +44,7 @@ public class Space extends Subject {
 
     private Player player;
 
+
     public Space(Board board, int x, int y) {
         this.board = board;
         this.x = x;
@@ -85,6 +86,16 @@ public class Space extends Subject {
 
     public List<FieldAction> getActions() {
         return actions;
+    }
+
+    public ConveyorBelt getConveyorBelt () {
+
+        return actions.stream()
+                .filter(action -> action instanceof ConveyorBelt)
+                .map(action -> (ConveyorBelt) action)
+                .findFirst()
+                .orElse(null);
+
     }
 
     public void addFieldAction (FieldAction action) {
