@@ -33,7 +33,6 @@ import java.util.stream.Stream;
  * ...
  *
  * @author Ekkart Kindler, ekki@dtu.dk
- *
  */
 public class GameController {
 
@@ -67,7 +66,7 @@ public class GameController {
      *
      * @param space the space to which the current player should move
      */
-    public void moveCurrentPlayerToSpace(@NotNull Space space)  {
+    public void moveCurrentPlayerToSpace(@NotNull Space space) {
         // TODO Assignment V1: method should be implemented by the students:
         //   - the current player should be moved to the given space
         //     (if it is free()
@@ -167,66 +166,31 @@ public class GameController {
         } while (board.getPhase() == Phase.ACTIVATION && !board.isStepMode());
     }
 
-    private List<Space> calculateConveyorPath(Player player, Space currentSpace, List<Space> pathAccumulator) {
 
-        pathAccumulator.add(currentSpace);
-
-        ConveyorBelt currentBelt = currentSpace.getConveyorBelt();
-
-        //If we reached the space at the end of the conveyor belt
-        if (currentBelt == null) {
-            return pathAccumulator;
-        }
-
-        //If belt has been visited by player then no action
-        if (currentBelt.visitedByPlayer(player)) {
-            return pathAccumulator;
-        }
-
-        // If action is possible recursively check target space
-        if (!currentBelt.doAction(this, currentSpace)) {
-            return pathAccumulator;
-        }
-        return calculateConveyorPath(player, currentBelt.getTarget(), pathAccumulator);
-
-    }
-
-    // Include in report
     private void handleConveyorMove(List<Player> players) {
 
-        Map<Player, List<Space>> pathMap = new HashMap<>();
+        Map<Space, List<Player>> destinationMap = new HashMap<>();
 
-        // Get path for each player
+        //Determine all final destinations of players on conveyor belts
         for (Player player : players) {
-            List<Space> path = calculateConveyorPath(player, player.getSpace(), new ArrayList<>());
-            pathMap.put(player, path);
-        }
+            Space source = player.getSpace();
+            ConveyorBelt belt = source.getConveyorBelt();
 
-        // Iterate over the entries of pathMap
-        for (Map.Entry<Player, List<Space>> entry : pathMap.entrySet()) {
-            Player player = entry.getKey();
-            List<Space> path = entry.getValue();
-            Space finalDestination = path.get(path.size() - 1);
-
-            // Check if this player's final destination is unique
-            boolean isUnique = pathMap.values().stream()
-                    .filter(spaces -> spaces.get(spaces.size() - 1).equals(finalDestination))
-                    .count() == 1;
-
-            // Update player's position
-            if (isUnique) {
-
-                player.setSpace(finalDestination);
-
-                // Mark all conveyor spaces on path as visited, under the assumption that at most only the end space could not be a conveyor
-                if (finalDestination.getConveyorBelt() == null) {
-                    path.remove(finalDestination);
-                }
-                for (Space space : path) {
-                    space.getConveyorBelt().addVisitedPlayer(player);
-                }
+            if (belt.doAction(this, source)) {
+                Space destination = belt.getTarget();
+                destinationMap.computeIfAbsent(destination, k -> new ArrayList<>()).add(player);
             }
         }
+
+        //Only move players with unique destinations
+        destinationMap.entrySet().stream()
+                .filter(entry -> entry.getValue().size() == 1)
+                .forEach(entry -> {
+                    Player player = entry.getValue().get(0);
+                    Space destination = entry.getKey();
+                    player.setSpace(destination);
+                });
+
 
     }
 
@@ -236,7 +200,7 @@ public class GameController {
 
         List<Player> playersOnConveyors = new ArrayList<>();
 
-        for (Player player: board.getPlayers()) {
+        for (Player player : board.getPlayers()) {
             Space space = player.getSpace();
             List<FieldAction> fieldActions = space.getActions();
 
@@ -244,9 +208,8 @@ public class GameController {
 
                 for (FieldAction action : fieldActions) {
 
-                    if (action instanceof ConveyorBelt) {
-                        if (!((ConveyorBelt) action).visitedByPlayer(player)) playersOnConveyors.add(player);
-                    }
+                    if (action instanceof ConveyorBelt) playersOnConveyors.add(player);
+
 
                     if (action.doAction(this, space)) {
                         //Add other action cases here
@@ -262,9 +225,6 @@ public class GameController {
     // XXX: V2
     private void executeNextStep() {
         //** Use in report **
-        if (stepFinished) executeFieldActions();
-
-
 
         Player currentPlayer = board.getCurrentPlayer();
         if (board.getPhase() == Phase.ACTIVATION && currentPlayer != null) {
@@ -281,7 +241,13 @@ public class GameController {
                     executeCommand(currentPlayer, command);
                 }
 
-                moveToNextProgramCard(currentPlayer);
+                int nextPlayerNumber = board.getPlayerNumber(currentPlayer) + 1;
+                if (nextPlayerNumber < board.getPlayersNumber()) {
+                    board.setCurrentPlayer(board.getPlayer(nextPlayerNumber));
+                } else {
+                    finishRegisterRound(step);
+                }
+
 
             } else {
                 // this should not happen
@@ -293,22 +259,15 @@ public class GameController {
         }
     }
 
-    private void moveToNextProgramCard(@NotNull Player currentPlayer) {
-        int nextPlayerNumber = board.getPlayerNumber(currentPlayer) + 1;
-        if (nextPlayerNumber < board.getPlayersNumber()) {
-            stepFinished = false;
-            board.setCurrentPlayer(board.getPlayer(nextPlayerNumber));
+    private void finishRegisterRound(int step) {
+        step++;
+        if (step < Player.NO_REGISTERS) {
+            executeFieldActions();
+            makeProgramFieldsVisible(step);
+            board.setStep(step);
+            board.setCurrentPlayer(board.getPlayer(0));
         } else {
-            stepFinished = true;
-            int step = board.getStep();
-            step++;
-            if (step < Player.NO_REGISTERS) {
-                makeProgramFieldsVisible(step);
-                board.setStep(step);
-                board.setCurrentPlayer(board.getPlayer(0));
-            } else {
-                startProgrammingPhase();
-            }
+            startProgrammingPhase();
         }
     }
 
@@ -332,6 +291,7 @@ public class GameController {
                 default:
                     // DO NOTHING (for now)
             }
+
         }
     }
 
@@ -340,7 +300,7 @@ public class GameController {
         if (player.board == board && player == board.getCurrentPlayer()) {
             board.setPhase(Phase.ACTIVATION);
             executeCommand(player, option);
-            moveToNextProgramCard(player);
+            finishRegisterRound(board.getStep());
 
 
             //Automatic execution continues after interactive map has been executed
@@ -376,14 +336,14 @@ public class GameController {
         if (source.getWalls().contains(heading) || destination.getWalls().contains(heading.opposing())) return;
 
         Player other = destination.getPlayer();
-        if (other != null ){
+        if (other != null) {
 
             Space otherDestination = board.getNeighbour(destination, heading);
             if (moveCount >= board.getPlayersNumber() || otherDestination != null && !otherDestination.getWalls().contains(heading.opposing())) {
                 // XXX Note that there might be additional problems with
                 //     infinite recursion here (in some special cases)!
                 //     We will come back to that!
-                moveToSpace(other, destination, otherDestination, heading, moveCount+1);
+                moveToSpace(other, destination, otherDestination, heading, moveCount + 1);
 
 
                 assert otherDestination.getPlayer() == null : otherDestination; // make sure target is free now
@@ -460,7 +420,6 @@ public class GameController {
 
                 });
     }
-
 
 
     /**

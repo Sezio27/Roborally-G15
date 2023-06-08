@@ -83,6 +83,7 @@ public class Board extends Subject {
 
         //Walls
         spaces[3][1].addWall(Heading.WEST);
+        spaces[2][4].addWall(Heading.WEST);
 
         //Conveyor Belts
         ConveyorBelt beltNorth = new ConveyorBelt(Heading.NORTH);
