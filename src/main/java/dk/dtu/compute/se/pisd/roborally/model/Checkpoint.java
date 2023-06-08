@@ -28,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
  * ...
  *
  * @author Ekkart Kindler, ekki@dtu.dk
- *
  */
 public class Checkpoint extends FieldAction {
 
@@ -46,12 +45,25 @@ public class Checkpoint extends FieldAction {
     @Override
     public boolean doAction(@NotNull GameController gameController, @NotNull Space space) {
         Player player = space.getPlayer();
-
         if (player != null) {
 
-        }
+            Space playerCheckpointSpace = player.getCurrentCheckpoint();
+            if (playerCheckpointSpace != null) {
+                Checkpoint playerCheckpoint = playerCheckpointSpace.getAction(Checkpoint.class);
+                if (number - playerCheckpoint.getNumber() == 1) {
+                    player.updateCheckpoint(space);
+                    /*
+                    if (number == gameController.board.getFinalCheckpoint) {
+                        gameController.handleWin(player);
+                        return true;
+                    }
 
-        return true;
+                     */
+                }
+            }
+        }
+        return false;
+
     }
 
 }

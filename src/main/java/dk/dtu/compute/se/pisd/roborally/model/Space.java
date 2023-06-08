@@ -83,23 +83,21 @@ public class Space extends Subject {
         }
     }
 
+    public <T extends FieldAction> T getAction(Class<T> type) {
+        return actions.stream()
+                .filter(type::isInstance)
+                .map(type::cast)
+                .findFirst()
+                .orElse(null);
+    }
 
     public List<FieldAction> getActions() {
         return actions;
     }
 
-    public ConveyorBelt getConveyorBelt () {
-
-        return actions.stream()
-                .filter(action -> action instanceof ConveyorBelt)
-                .map(action -> (ConveyorBelt) action)
-                .findFirst()
-                .orElse(null);
-
-    }
 
     public void addFieldAction (FieldAction action) {
-        if ( ! actions.contains(action)) {
+        if (!actions.contains(action)) {
             actions.add(action);
             notifyChange();
         }

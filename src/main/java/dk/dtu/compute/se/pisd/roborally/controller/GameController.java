@@ -37,28 +37,13 @@ import java.util.stream.Stream;
 public class GameController {
 
     final public Board board;
-    private Map<Space, List<Space>> conveyorPaths = new HashMap<>();
-    private boolean stepFinished = false;
+
 
     public GameController(@NotNull Board board) {
         this.board = board;
-        calculateConveyorPaths();
-        printTest1();
     }
 
-    private void printTest1() {
-        for (int i = 0; i < conveyorPaths.size(); i++) {
-            Space key = (Space) conveyorPaths.keySet().toArray()[i];
-            System.out.println(i);
-            System.out.println("Source: (" + key.x + ", " + key.y + ")");
-            System.out.print("Path:");
-            for (Space space : conveyorPaths.get(key)) {
-                System.out.print(" (" + space.x + ", " + space.y + ")");
-            }
-            System.out.println();
-            System.out.println();
-        }
-    }
+
 
     /**
      * This is just some dummy controller operation to make a simple move to see something
@@ -174,7 +159,7 @@ public class GameController {
         //Determine all final destinations of players on conveyor belts
         for (Player player : players) {
             Space source = player.getSpace();
-            ConveyorBelt belt = source.getConveyorBelt();
+            ConveyorBelt belt = source.getAction(ConveyorBelt.class);
 
             if (belt.doAction(this, source)) {
                 Space destination = belt.getTarget();
@@ -386,40 +371,6 @@ public class GameController {
         }
     }
 
-
-    // To be deleted
-    private void calculateConveyorPaths() {
-
-        // For each space that has a conveyor belt, calculate the conveyor path
-        Arrays.stream(board.getSpaces())
-                .flatMap(Arrays::stream)
-                .filter(space ->
-                        space.getActions().stream().anyMatch(action -> action instanceof ConveyorBelt))
-                .forEach(space -> {
-
-                    if (conveyorPaths.containsKey(space)) return;
-
-                    List<Space> path = new ArrayList<>();
-
-                    ConveyorBelt belt = space.getConveyorBelt();
-
-                    Space target = board.getNeighbour(space, belt.getHeading());
-
-                    //Build path
-                    path.add(target);
-                    while (target.getConveyorBelt() != null) {
-                        ConveyorBelt destConveyor = target.getConveyorBelt();
-                        target = board.getNeighbour(target, destConveyor.getHeading());
-                        path.add(target);
-                    }
-
-                    conveyorPaths.put(space, path);
-
-                    IntStream.range(1, path.size() - 1)
-                            .forEach(i -> conveyorPaths.put(path.get(i), path.subList(i + 1, path.size())));
-
-                });
-    }
 
 
     /**
