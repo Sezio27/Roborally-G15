@@ -40,8 +40,9 @@ public class Space extends Subject {
 
     private FieldAction action;
 
-    // Currently not supporting multiple field actions on a single space
-    // private List<FieldAction> actions = new ArrayList<>();
+    /* Currently not supporting multiple field actions on a single space
+     private List<FieldAction> actions = new ArrayList<>();
+     */
     public final int x;
     public final int y;
 

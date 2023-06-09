@@ -58,6 +58,8 @@ public class Board extends Subject {
 
     private int numberOfCheckpoints;
 
+    private Space[] startSpaces;
+
 
     public Board(int width, int height, @NotNull String boardName) {
         this.boardName = boardName;
@@ -77,8 +79,23 @@ public class Board extends Subject {
 
     }
 
+    public Board(int width, int height) {
+        this(width, height, "defaultboard");
+    }
+
+    public void setStartSpacesDefault(int maxPlayer) {
+        startSpaces = new Space[maxPlayer];
+        for (int i = 0; i < maxPlayer; i++) {
+            startSpaces[i] = spaces[0][i];
+        }
+    }
+
+    public Space[] getStartSpaces() {
+        return startSpaces;
+    }
+
     // To be deleted
-    private void putCheckPoint(Space space){
+    private void putCheckPoint(Space space) {
         numberOfCheckpoints++;
         space.setAction(new Checkpoint(numberOfCheckpoints));
     }
@@ -86,6 +103,9 @@ public class Board extends Subject {
 
     //TO BE DELETED
     private void testBoard() {
+
+        //Starting Spaces
+
 
         //Walls
         spaces[3][1].addWall(Heading.WEST);
@@ -109,10 +129,6 @@ public class Board extends Subject {
         putCheckPoint(spaces[3][4]);
         putCheckPoint(spaces[5][6]);
 
-    }
-
-    public Board(int width, int height) {
-        this(width, height, "defaultboard");
     }
 
     public Integer getGameId() {
@@ -183,7 +199,9 @@ public class Board extends Subject {
         }
     }
 
-    public int getNumberOfCheckpoints() {return numberOfCheckpoints;}
+    public int getNumberOfCheckpoints() {
+        return numberOfCheckpoints;
+    }
 
     public int getStep() {
         return step;

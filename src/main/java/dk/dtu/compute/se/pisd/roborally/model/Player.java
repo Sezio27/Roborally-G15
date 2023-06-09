@@ -50,12 +50,15 @@ public class Player extends Subject {
 
     private int currentCheckpoint;
 
+    private Space spawnSpace;
+
     public Player(@NotNull Board board, String color, @NotNull String name) {
         this.board = board;
         this.name = name;
         this.color = color;
         this.space = null;
         this.currentCheckpoint = 0;
+        this.spawnSpace = null;
 
         program = new CommandCardField[NO_REGISTERS];
         for (int i = 0; i < program.length; i++) {
@@ -70,6 +73,14 @@ public class Player extends Subject {
 
     public String getName() {
         return name;
+    }
+
+    public void setSpawnSpace(Space spawnSpace) {
+        this.spawnSpace = spawnSpace;
+    }
+
+    public Space getSpawnSpace() {
+        return spawnSpace;
     }
 
     public void setName(String name) {

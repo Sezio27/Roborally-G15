@@ -44,6 +44,10 @@ public class GameController {
     }
 
 
+    public void initializeGame() {
+
+    }
+
     /**
      * This is just some dummy controller operation to make a simple move to see something
      * happening on the board. This method should eventually be deleted!
