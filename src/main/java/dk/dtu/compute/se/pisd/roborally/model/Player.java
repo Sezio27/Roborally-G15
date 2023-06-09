@@ -49,8 +49,9 @@ public class Player extends Subject {
     private CommandCardField[] cards;
 
     private int currentCheckpoint;
-
     private Space spawnSpace;
+
+    private boolean rebooting;
 
     public Player(@NotNull Board board, String color, @NotNull String name) {
         this.board = board;
@@ -59,6 +60,7 @@ public class Player extends Subject {
         this.space = null;
         this.currentCheckpoint = 0;
         this.spawnSpace = null;
+        this.rebooting = false;
 
         program = new CommandCardField[NO_REGISTERS];
         for (int i = 0; i < program.length; i++) {
@@ -137,6 +139,12 @@ public class Player extends Subject {
             }
         }
     }
+
+    public void setRebooting(boolean rebooting) {
+        this.rebooting = rebooting;
+    }
+
+    public boolean isRebooting() { return rebooting; }
 
     public CommandCardField getProgramField(int i) {
         return program[i];

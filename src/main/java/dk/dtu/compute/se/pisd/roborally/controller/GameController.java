@@ -74,12 +74,14 @@ public class GameController {
 
     }
 
-    public void updateCheckpoint(@NotNull Player player, int number) {
-        player.updateCheckpoint();
+    public void updateCheckpoint(@NotNull Player player, Space space, int number) {
+
         System.out.println(player.getName() + " - new checkpoint: " + player.getCurrentCheckpoint());
         if (board.getNumberOfCheckpoints() == number) {
             handleWin(player);
         }
+        player.updateCheckpoint();
+        player.setSpawnSpace(space);
 
     }
 
@@ -95,6 +97,9 @@ public class GameController {
 
         for (int i = 0; i < board.getPlayersNumber(); i++) {
             Player player = board.getPlayer(i);
+            if (player.isRebooting()) {
+                player.setSpace(player.getSpawnSpace());
+            }
             if (player != null) {
                 for (int j = 0; j < Player.NO_REGISTERS; j++) {
                     CommandCardField field = player.getProgramField(j);
@@ -202,17 +207,19 @@ public class GameController {
 
         for (Player player : board.getPlayers()) {
             Space space = player.getSpace();
+            if (space != null) {
+                FieldAction action = space.getAction();
+                if (action != null) {
 
-            FieldAction action = space.getAction();
-            if (action != null) {
 
+                    //Special case for conveyors, must be handled separately
+                    if (action instanceof ConveyorBelt) {
+                        playersOnConveyors.add(player);
+                    } else action.doAction(this, space);
 
-                //Special case for conveyors, must be handled separately
-                if (action instanceof ConveyorBelt) {
-                    playersOnConveyors.add(player);
-                } else action.doAction(this, space);
-
+                }
             }
+
         }
 
         if (!playersOnConveyors.isEmpty()) handleConveyorMove(playersOnConveyors);
@@ -305,28 +312,28 @@ public class GameController {
         }
     }
 
-    // TODO: V2
     public void moveForward(@NotNull Player player, Heading heading) {
         if (player.board == board) {
             Space source = player.getSpace();
             Space destination = board.getNeighbour(source, heading);
 
-            if (destination != null) {
-                try {
-                    int moveCount = 1; // Used to avoid possible cyclic infinite recursion
-                    moveToSpace(player, source, destination, heading, moveCount);
-                } catch (ImpossibleMoveException e) {
-                    System.out.println(e);
-                }
-
+            try {
+                int moveCount = 1; // Used to avoid possible cyclic infinite recursion
+                moveToSpace(player, source, destination, heading, moveCount);
+            } catch (ImpossibleMoveException e) {
+                System.out.println(e);
             }
+
         }
     }
 
     // *Include in report*
-    private void moveToSpace(@NotNull Player player, @NotNull Space source, @NotNull Space destination, @NotNull Heading heading, int moveCount) throws ImpossibleMoveException {
-        assert board.getNeighbour(player.getSpace(), heading) == destination; // make sure the move to here is possible in principle
-
+    private void moveToSpace(@NotNull Player player, @NotNull Space source, Space destination, @NotNull Heading heading, int moveCount) throws ImpossibleMoveException {
+        //Or a pit
+        if (destination == null) {
+            handleReboot(player);
+            return;
+        };
 
         if (source.getWalls().contains(heading) || destination.getWalls().contains(heading.opposing())) return;
 
@@ -334,18 +341,39 @@ public class GameController {
         if (other != null) {
 
             Space otherDestination = board.getNeighbour(destination, heading);
-            if (moveCount >= board.getPlayersNumber() || otherDestination != null && !otherDestination.getWalls().contains(heading.opposing())) {
+            if (otherDestination == null) {
+                handleReboot(other);
+                player.setSpace(destination);
+                return;
+            }
+
+            if (moveCount <= board.getPlayersNumber() && !otherDestination.getWalls().contains(heading.opposing())) {
 
                 moveToSpace(other, destination, otherDestination, heading, moveCount + 1);
 
-
-                assert otherDestination.getPlayer() == null : otherDestination; // make sure target is free now
             } else {
                 throw new ImpossibleMoveException(player, destination, heading);
             }
         }
 
         player.setSpace(destination);
+
+    }
+
+    private void handleReboot(@NotNull Player player) {
+
+        player.setRebooting(true);
+        for (int j = board.getStep()+1; j < Player.NO_REGISTERS; j++) {
+            CommandCardField field = player.getProgramField(j);
+            field.setCard(null);
+        }
+        for (int j = 0; j < Player.NO_CARDS; j++) {
+            CommandCardField field = player.getCardField(j);
+            field.setCard(null);
+            field.setVisible(true);
+        }
+
+
 
     }
 

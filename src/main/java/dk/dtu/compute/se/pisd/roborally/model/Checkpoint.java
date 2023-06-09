@@ -47,7 +47,7 @@ public class Checkpoint extends FieldAction {
         Player player = space.getPlayer();
         if (player != null) {
             if (number - player.getCurrentCheckpoint() == 1) {
-                gameController.updateCheckpoint(player, number);
+                gameController.updateCheckpoint(player, space, number);
                 return true;
             }
         }
