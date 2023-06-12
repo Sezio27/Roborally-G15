@@ -259,9 +259,11 @@ public class Board extends Subject {
         // status of the game
 
         // XXX: V2 changed the status so that it shows the phase, the player and the step
-        return "Phase: " + getPhase().name() +
+        return  "Map: " + boardName +
+                ", phase: " + getPhase().name() +
                 ", Player = " + getCurrentPlayer().getName() +
-                ", Step: " + getStep();
+                ", Step: " + getStep() +
+                ", current checkpoint: " + getCurrentPlayer().getCurrentCheckpoint();
     }
 
 
