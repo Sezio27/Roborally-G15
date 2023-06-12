@@ -21,6 +21,8 @@
  */
 package dk.dtu.compute.se.pisd.roborally.model;
 
+import com.google.gson.annotations.Expose;
+import dk.dtu.compute.se.pisd.designpatterns.observer.Observer;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,14 +40,18 @@ public class Player extends Subject {
     final public static int NO_CARDS = 8;
 
     final public Board board;
-
+    @Expose
     private String name;
+    @Expose
     private String color;
-
+    @Expose
     private Space space;
+    @Expose
     private Heading heading = SOUTH;
 
+    @Expose
     private CommandCardField[] program;
+    @Expose
     private CommandCardField[] cards;
 
     private int currentCheckpoint;
@@ -61,6 +67,7 @@ public class Player extends Subject {
         this.currentCheckpoint = 0;
         this.spawnSpace = null;
         this.rebooting = false;
+
 
         program = new CommandCardField[NO_REGISTERS];
         for (int i = 0; i < program.length; i++) {
@@ -149,10 +156,21 @@ public class Player extends Subject {
     public CommandCardField getProgramField(int i) {
         return program[i];
     }
+    public void setProgramField(int i, CommandCardField field){
+        program[i].setCard(field.getCard());
+        program[i].setVisible(field.isVisible());
+        notifyChange();
+    }
 
     public CommandCardField getCardField(int i) {
         return cards[i];
+
     }
+    public void setCardField(int i, CommandCardField field){
+        cards[i].setCard(field.getCard());
+        notifyChange();
+    }
+
 
     public int getCurrentCheckpoint() { return currentCheckpoint; }
     public void updateCheckpoint() { currentCheckpoint++;}

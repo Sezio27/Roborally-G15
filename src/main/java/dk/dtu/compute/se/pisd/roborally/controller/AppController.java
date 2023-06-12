@@ -3,14 +3,11 @@ package dk.dtu.compute.se.pisd.roborally.controller;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Observer;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.RoboRally;
-import dk.dtu.compute.se.pisd.roborally.model.Board;
-import dk.dtu.compute.se.pisd.roborally.model.Player;
-import dk.dtu.compute.se.pisd.roborally.model.Space;
+import dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard;
+import dk.dtu.compute.se.pisd.roborally.model.*;
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceDialog;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -31,11 +28,6 @@ public class AppController implements Observer {
     }
 
     public void newGame() {
-
-        int playerCount = 0;
-
-        while (playerCount < 1) playerCount = selectPlayerCount();
-
         if (gameController != null) {
             // The UI should not allow this, but in case this happens anyway.
             // give the user the option to save the game or abort this operation!
@@ -43,8 +35,42 @@ public class AppController implements Observer {
                 return;
             }
         }
+        String[] list = LoadBoard.getTracks();
+        if (list == null) {
+            System.out.println("Couldnt find tracks to load");
+            return;
+        }
 
-        createAndStartDefault(playerCount);
+        ChoiceDialog<String> dialog =
+                new ChoiceDialog<>(list[0], list);
+        dialog.setTitle("Track selection");
+        dialog.setHeaderText("Pick a track");
+
+        Optional<String> result = dialog.showAndWait();
+        String track = "";
+        if (result.isPresent())
+            track = result.get();
+        System.out.println("Track chosen: " + track);
+
+        int playerCount = 0;
+
+        while (playerCount < 1) playerCount = selectPlayerCount();
+
+        if (result.isPresent()) {
+            Board board = LoadBoard.loadBoard(track);
+            gameController = new GameController(board);
+
+            board.setCurrentPlayer(board.getPlayer(0));
+            board.setStartSpacesDefault(playerCount);
+            createPlayers(board,playerCount);
+
+            gameController.startProgrammingPhase();
+
+            roboRally.createBoardView(gameController);
+
+        }
+
+        //createAndStartDefault(playerCount);
 
     }
 
@@ -92,15 +118,42 @@ public class AppController implements Observer {
     }
 
     public void saveGame() {
-        // XXX needs to be implemented eventually
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Save game");
+        dialog.setHeaderText("save as");
+
+        String result = "";
+        result = dialog.showAndWait().get();
+
+        if(!result.equals("")) {
+            LoadBoard.saveCurrentGame(this.gameController.board, result);
+            System.out.println("Saved as " + result);
+        }
     }
 
     public void loadGame() {
-        // XXX needs to be implememted eventually
-        // for now, we just create a new game
-        if (gameController == null) {
-            newGame();
+        String[] list = LoadBoard.getActiveGames();
+        if (list == null) {
+            System.out.println("Aint no active games son");
+            return;
         }
+
+        ChoiceDialog<String> dialog =
+                new ChoiceDialog<>(list[0], list);
+        dialog.setTitle("Game selection");
+        dialog.setHeaderText("Pick an active game");
+
+        Optional<String> result = dialog.showAndWait();
+        String track = "";
+        if (result.isPresent())
+            track = result.get();
+        System.out.println("Du har valgt bane: " + track);
+
+        Board board = LoadBoard.loadActiveBoard(track);
+        gameController = new GameController(board);
+
+
+        roboRally.createBoardView(gameController);
     }
 
 
@@ -118,7 +171,7 @@ public class AppController implements Observer {
         if (gameController != null) {
 
             // here we save the game (without asking the user).
-            saveGame();
+            //saveGame();
 
             gameController = null;
             roboRally.createBoardView(null);

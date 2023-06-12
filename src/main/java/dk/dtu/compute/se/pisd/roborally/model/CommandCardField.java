@@ -21,6 +21,7 @@
  */
 package dk.dtu.compute.se.pisd.roborally.model;
 
+import com.google.gson.annotations.Expose;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 
 /**
@@ -33,6 +34,7 @@ public class CommandCardField extends Subject {
 
     final public Player player;
 
+    @Expose
     private CommandCard card;
 
     private boolean visible;
