@@ -54,11 +54,10 @@ public class AppController implements Observer {
         Board board = new Board(8, 8);
         gameController = new GameController(board);
 
-        board.setStartSpacesDefault(PLAYER_NUMBER_OPTIONS.size());
 
         createPlayers(board, playerCount);
 
-        gameController.initializeGame();
+        gameController.initializeGame(playerCount);
 
         //Remember based on saved state can be other starting phase..
         gameController.startProgrammingPhase();
@@ -73,12 +72,8 @@ public class AppController implements Observer {
         for (int i = 0; i < playerCount; i++) {
             Player player = new Player(board, PLAYER_COLORS.get(i), "Player " + (i + 1));
             board.addPlayer(player);
-            Space startSpace = board.getStartSpaces()[i];
-            player.setSpace(startSpace);
-            player.setSpawnSpace(startSpace);
 
         }
-
 
     }
 

@@ -44,7 +44,14 @@ public class GameController {
     }
 
 
-    public void initializeGame() {
+    public void initializeGame(int maxPlayers) {
+        board.setStartSpacesDefault(maxPlayers);
+        for (int i = 0; i < maxPlayers; i++) {
+            Player player = board.getPlayer(i);
+            Space startSpace = board.getStartSpaces()[i];
+            player.setSpace(startSpace);
+            player.setSpawnSpace(startSpace);
+        }
 
     }
 
