@@ -98,22 +98,93 @@ class GameControllerTest {
         board.getSpace(4,2).addWall(Heading.NORTH);
         gameController.moveForward(player1,Heading.SOUTH);
 
+
         Assertions.assertEquals(player1.getSpace(), board.getSpace(4,1));
     }
 
     @Test
-    void ConveyorSuccesful(){
+    void Gears() {
+    }
+
+    @Test
+    void OutOfMap(){
         Board board = gameController.board;
-        ConveyorBelt beltSouth = new ConveyorBelt(Heading.SOUTH);
 
+        Space startSpace1 = board.getStartSpaces()[0];
         Player player1 = board.getPlayer(0);
-        player1.setSpace(board.getSpace(4,1));
+        player1.setSpace(board.getSpace(1,8));
 
-        board.getSpace(4,2).setAction(beltSouth);
-        beltSouth.doAction(gameController,board.getSpace(4,3));
         gameController.moveForward(player1, Heading.SOUTH);
+        gameController.finishProgrammingPhase();
+        gameController.executePrograms();
 
-        Assertions.assertEquals(player1.getSpace(), board.getSpace(4,2));
+        Assertions.assertEquals(player1.getSpace(), startSpace1);
+    }
+
+    @Test
+    void clearClardRegister(){
+
+    }
+
+    @Test
+    void visibleOnMap(){
+        Board board = gameController.board;
+        Player player1 = board.getPlayer(0);
+
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                Assertions.assertNotEquals(player1.getSpace(), board.getSpace(i, j));
+            }
+        }
+    }
+
+    @Test
+    void order(){
+        Board board = gameController.board;
+        Player player1 = board.getPlayer(0);
+        Player player2 = board.getPlayer(1);
+
+        board.putCheckPoint(board.getSpace(3,3));
+        player1.setSpace(board.getSpace(1,3));
+        player2.setSpace(board.getSpace(0,2));
+        gameController.startProgrammingPhase();
+
+        Assertions.assertEquals(board.getPlayer(0), board.getCurrentPlayer());
+    }
+
+    @Test
+    void checkPointIfConditionNotMet(){
+        Board board = gameController.board;
+        Player player1 = board.getPlayer(0);
+
+        board.putCheckPoint(board.getSpace(4,4));
+        player1.setSpace(board.getSpace(4,3));
+        gameController.moveForward(player1,Heading.SOUTH);
+
+        Assertions.assertNotEquals(board.getPlayer(0).getCurrentCheckpoint(), 1);
+    }
+    @Test
+    void playerWin(){
+       Board board = gameController.board;
+       Player player1 = board.getPlayer(0);
+
+       player1.setSpace(board.getSpace(1,1));
+       gameController.moveForward(player1,Heading.SOUTH);
+       gameController.executeFieldActions();
+
+       player1.setSpace(board.getSpace(3,2));
+       gameController.moveForward(player1,Heading.NORTH);
+       gameController.executeFieldActions();
+
+       player1.setSpace(board.getSpace(3,3));
+       gameController.moveForward(player1,Heading.SOUTH);
+       gameController.executeFieldActions();
+
+       player1.setSpace(board.getSpace(5,5));
+       gameController.moveForward(player1,Heading.SOUTH);
+       gameController.executeFieldActions();
+
+       Assertions.assertEquals(board.getPlayer(0).getCurrentCheckpoint(), board.getNumberOfCheckpoints());
     }
 }
 

@@ -99,7 +99,7 @@ public class Board extends Subject {
     }
 
     // To be deleted
-    private void putCheckPoint(Space space) {
+    public void putCheckPoint(Space space) {
         numberOfCheckpoints++;
         space.setAction(new Checkpoint(numberOfCheckpoints));
     }

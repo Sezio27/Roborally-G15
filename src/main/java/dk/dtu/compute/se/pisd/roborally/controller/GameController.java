@@ -209,7 +209,7 @@ public class GameController {
 
 
     //** Use in report**
-    private void executeFieldActions() {
+    public void executeFieldActions() {
 
         List<Player> playersOnConveyors = new ArrayList<>();
 
