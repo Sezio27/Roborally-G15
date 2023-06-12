@@ -23,6 +23,7 @@ public class AppController implements Observer {
 
     private GameController gameController;
 
+
     public AppController(@NotNull RoboRally roboRally) {
         this.roboRally = roboRally;
     }
@@ -35,51 +36,18 @@ public class AppController implements Observer {
                 return;
             }
         }
-        String[] list = LoadBoard.getTracks();
-        if (list == null) {
-            System.out.println("Couldnt find tracks to load");
-            return;
-        }
 
-        ChoiceDialog<String> dialog =
-                new ChoiceDialog<>(list[0], list);
-        dialog.setTitle("Track selection");
-        dialog.setHeaderText("Pick a track");
-
-        Optional<String> result = dialog.showAndWait();
-        String track = "";
-        if (result.isPresent())
-            track = result.get();
-        System.out.println("Track chosen: " + track);
 
         int playerCount = 0;
-
         while (playerCount < 1) playerCount = selectPlayerCount();
+        createAndStartDefault(playerCount);
 
-        if (result.isPresent()) {
-            Board board = LoadBoard.loadBoard(track);
-            gameController = new GameController(board);
-
-            board.setCurrentPlayer(board.getPlayer(0));
-            board.setStartSpacesDefault(playerCount);
-            createPlayers(board,playerCount);
-
-            gameController.startProgrammingPhase();
-
-            roboRally.createBoardView(gameController);
-
-        }
-
-        //createAndStartDefault(playerCount);
 
     }
-
-    //Temporary
 
     private void createAndStartDefault(int playerCount) {
         Board board = new Board(8, 8);
         gameController = new GameController(board);
-
 
         createPlayers(board, playerCount);
 
@@ -103,6 +71,30 @@ public class AppController implements Observer {
 
     }
 
+    private String selectBoard() {
+        String[] list = LoadBoard.getTracks();
+
+        if (LoadBoard.getTracks() != null) {
+            ChoiceDialog<String> dialog = new ChoiceDialog<>(list[0], list);
+            dialog.setTitle("Track selection");
+            dialog.setHeaderText("Pick a track");
+            Optional<String> result = dialog.showAndWait();
+
+            if (result.isPresent()) {
+                String track = result.get();
+                System.out.println("Track chosen: " + track);
+                return track;
+            }
+        }
+
+        System.out.println("Could not find tracks to load");
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setHeaderText("No saved tracks");
+        alert.showAndWait();
+        return null;
+
+    }
+
     // End of temporary
 
     private int selectPlayerCount() {
@@ -113,7 +105,6 @@ public class AppController implements Observer {
 
         if (playerCount.isPresent()) return playerCount.get();
 
-        //Should not happen
         return -1;
     }
 
@@ -125,7 +116,7 @@ public class AppController implements Observer {
         String result = "";
         result = dialog.showAndWait().get();
 
-        if(!result.equals("")) {
+        if (!result.equals("")) {
             LoadBoard.saveCurrentGame(this.gameController.board, result);
             System.out.println("Saved as " + result);
         }
@@ -155,7 +146,6 @@ public class AppController implements Observer {
 
         roboRally.createBoardView(gameController);
     }
-
 
 
     /**
@@ -207,6 +197,13 @@ public class AppController implements Observer {
     @Override
     public void update(Subject subject) {
         // XXX do nothing for now
+    }
+
+
+    class UnableToStartException extends Exception {
+        public UnableToStartException() {
+            super("Unable to start game");
+        }
     }
 
 }

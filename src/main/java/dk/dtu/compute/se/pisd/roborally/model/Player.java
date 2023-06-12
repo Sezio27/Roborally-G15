@@ -53,10 +53,11 @@ public class Player extends Subject {
     private CommandCardField[] program;
     @Expose
     private CommandCardField[] cards;
-
+    @Expose
     private int currentCheckpoint;
+    @Expose
     private Space spawnSpace;
-
+    @Expose
     private boolean rebooting;
 
     public Player(@NotNull Board board, String color, @NotNull String name) {

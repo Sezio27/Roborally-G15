@@ -38,11 +38,9 @@ public class GameController {
 
     final public Board board;
 
-
     public GameController(@NotNull Board board) {
         this.board = board;
     }
-
 
     public void initializeGame(int maxPlayers) {
         board.setStartSpacesDefault(maxPlayers);
@@ -55,20 +53,7 @@ public class GameController {
 
     }
 
-    /**
-     * This is just some dummy controller operation to make a simple move to see something
-     * happening on the board. This method should eventually be deleted!
-     *
-     * @param space the space to which the current player should move
-     */
     public void moveCurrentPlayerToSpace(@NotNull Space space) {
-        // TODO Assignment V1: method should be implemented by the students:
-        //   - the current player should be moved to the given space
-        //     (if it is free()
-        //   - and the current player should be set to the player
-        //     following the current player
-        //   - the counter of moves in the game should be increased by one
-        //     if the player is moved
 
         if (space != null && space.board == board) {
             Player currentPlayer = board.getCurrentPlayer();
@@ -96,7 +81,6 @@ public class GameController {
         System.out.println(player.getName() + " has won!");
     }
 
-    // XXX: V2
     public void startProgrammingPhase() {
         board.setPhase(Phase.PROGRAMMING);
         board.setCurrentPlayer(board.getPlayer(0));
@@ -123,14 +107,12 @@ public class GameController {
         }
     }
 
-    // XXX: V2
     private CommandCard generateRandomCommandCard() {
         Command[] commands = Command.values();
         int random = (int) (Math.random() * commands.length);
         return new CommandCard(commands[random]);
     }
 
-    // XXX: V2
     public void finishProgrammingPhase() {
         makeProgramFieldsInvisible();
         makeProgramFieldsVisible(0);
@@ -139,7 +121,6 @@ public class GameController {
         board.setStep(0);
     }
 
-    // XXX: V2
     private void makeProgramFieldsVisible(int register) {
         if (register >= 0 && register < Player.NO_REGISTERS) {
             for (int i = 0; i < board.getPlayersNumber(); i++) {
@@ -150,7 +131,6 @@ public class GameController {
         }
     }
 
-    // XXX: V2
     private void makeProgramFieldsInvisible() {
         for (int i = 0; i < board.getPlayersNumber(); i++) {
             Player player = board.getPlayer(i);
@@ -161,25 +141,21 @@ public class GameController {
         }
     }
 
-    // XXX: V2
     public void executePrograms() {
         board.setStepMode(false);
         continuePrograms();
     }
 
-    // XXX: V2
     public void executeStep() {
         board.setStepMode(true);
         continuePrograms();
     }
 
-    // XXX: V2
     private void continuePrograms() {
         do {
             executeNextStep();
         } while (board.getPhase() == Phase.ACTIVATION && !board.isStepMode());
     }
-
 
     private void handleConveyorMove(List<Player> players) {
 
@@ -208,7 +184,6 @@ public class GameController {
     }
 
 
-    //** Use in report**
     private void executeFieldActions() {
 
         List<Player> playersOnConveyors = new ArrayList<>();
@@ -233,9 +208,7 @@ public class GameController {
         if (!playersOnConveyors.isEmpty()) handleConveyorMove(playersOnConveyors);
     }
 
-    // XXX: V2
     private void executeNextStep() {
-        //** Use in report **
 
         Player currentPlayer = board.getCurrentPlayer();
         if (board.getPhase() == Phase.ACTIVATION && currentPlayer != null) {
@@ -391,20 +364,17 @@ public class GameController {
 
     }
 
-    // TODO: V2
     public void fastForward(@NotNull Player player) {
         moveForward(player, player.getHeading());
         moveForward(player, player.getHeading());
     }
 
-    // TODO: V2
     public void turnRight(@NotNull Player player) {
         if (player != null && player.board == board) {
             player.setHeading(player.getHeading().next());
         }
     }
 
-    // TODO: V2
     public void turnLeft(@NotNull Player player) {
         if (player != null && player.board == board) {
             player.setHeading(player.getHeading().prev());
@@ -421,16 +391,6 @@ public class GameController {
         } else {
             return false;
         }
-    }
-
-
-    /**
-     * A method called when no corresponding controller operation is implemented yet. This
-     * should eventually be removed.
-     */
-    public void notImplemented() {
-        // XXX just for now to indicate that the actual method is not yet implemented
-        assert false;
     }
 
     class ImpossibleMoveException extends Exception {

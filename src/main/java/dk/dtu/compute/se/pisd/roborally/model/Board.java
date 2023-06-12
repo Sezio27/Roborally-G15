@@ -83,7 +83,6 @@ public class Board extends Subject {
         }
         deadSpace = new Space(this,-1,-1);
         numberOfCheckpoints = 0;
-        //testBoard();
 
         this.stepMode = false;
 
@@ -108,37 +107,6 @@ public class Board extends Subject {
     private void putCheckPoint(Space space) {
         numberOfCheckpoints++;
         space.setAction(new Checkpoint(numberOfCheckpoints));
-    }
-
-
-    //TO BE DELETED
-    private void testBoard() {
-
-        //Starting Spaces
-
-
-        //Walls
-        spaces[3][1].addWall(Heading.WEST);
-        spaces[2][4].addWall(Heading.WEST);
-
-        //Conveyor Belts
-        ConveyorBelt beltNorth = new ConveyorBelt(Heading.NORTH);
-        ConveyorBelt beltSouth = new ConveyorBelt(Heading.SOUTH);
-        ConveyorBelt beltWest = new ConveyorBelt(Heading.WEST);
-        ConveyorBelt beltEast = new ConveyorBelt(Heading.EAST);
-        spaces[0][1].setAction(beltSouth);
-        spaces[0][2].setAction(beltSouth);
-        spaces[0][3].setAction(beltSouth);
-        spaces[0][4].setAction(beltEast);
-        spaces[1][4].setAction(beltEast);
-        spaces[2][4].setAction(beltEast);
-
-        //Checkpoints
-        putCheckPoint(spaces[1][2]);
-        putCheckPoint(spaces[3][1]);
-        putCheckPoint(spaces[3][4]);
-        putCheckPoint(spaces[5][6]);
-
     }
 
     public Integer getGameId() {

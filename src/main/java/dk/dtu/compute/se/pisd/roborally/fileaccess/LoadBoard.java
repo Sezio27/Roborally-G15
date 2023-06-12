@@ -156,6 +156,7 @@ public class LoadBoard {
             if(player.getName().equals(current.getName()))
                 board.setCurrentPlayer(player);
 
+            player.setSpawnSpace(p.getSpawnSpace());
 
         }
         board.setPhase(phase);
