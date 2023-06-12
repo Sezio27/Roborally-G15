@@ -22,6 +22,7 @@
 package dk.dtu.compute.se.pisd.roborally.model;
 
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
+import dk.dtu.compute.se.pisd.roborally.view.SpaceView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -60,6 +61,8 @@ public class Board extends Subject {
 
     private Space[] startSpaces;
 
+    private Space deadSpace;
+
 
     public Board(int width, int height, @NotNull String boardName) {
         this.boardName = boardName;
@@ -72,6 +75,7 @@ public class Board extends Subject {
                 spaces[x][y] = space;
             }
         }
+        deadSpace = new Space(this,-1,-1);
         numberOfCheckpoints = 0;
         testBoard();
 
@@ -150,7 +154,7 @@ public class Board extends Subject {
                 y >= 0 && y < height) {
             return spaces[x][y];
         } else {
-            return null;
+            return deadSpace;
         }
     }
 
@@ -264,8 +268,8 @@ public class Board extends Subject {
         return getSpace(x, y);
     }
 
-    public Space[][] getSpaces() {
-        return spaces;
+    public Space getDeadSpace() {
+        return deadSpace;
     }
 
     public String getStatusMessage() {
@@ -278,6 +282,7 @@ public class Board extends Subject {
                 ", Player = " + getCurrentPlayer().getName() +
                 ", Step: " + getStep();
     }
+
 
 
 }

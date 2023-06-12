@@ -46,6 +46,7 @@ public class BoardView extends VBox implements ViewObserver {
 
     private GridPane mainBoardPane;
     private SpaceView[][] spaces;
+    private SpaceView deadSpace;
 
     private PlayersView playersView;
 
@@ -77,7 +78,7 @@ public class BoardView extends VBox implements ViewObserver {
                 spaceView.setOnMouseClicked(spaceEventHandler);
             }
         }
-
+        deadSpace = new SpaceView(board.getDeadSpace());
         board.attach(this);
         update(board);
     }

@@ -99,6 +99,7 @@ public class GameController {
             Player player = board.getPlayer(i);
             if (player.isRebooting()) {
                 player.setSpace(player.getSpawnSpace());
+                player.setRebooting(false);
             }
             if (player != null) {
                 for (int j = 0; j < Player.NO_REGISTERS; j++) {
@@ -330,7 +331,7 @@ public class GameController {
     // *Include in report*
     private void moveToSpace(@NotNull Player player, @NotNull Space source, Space destination, @NotNull Heading heading, int moveCount) throws ImpossibleMoveException {
         //Or a pit
-        if (destination == null) {
+        if (destination == board.getDeadSpace()) {
             handleReboot(player);
             return;
         };
@@ -341,7 +342,7 @@ public class GameController {
         if (other != null) {
 
             Space otherDestination = board.getNeighbour(destination, heading);
-            if (otherDestination == null) {
+            if (otherDestination == board.getDeadSpace()) {
                 handleReboot(other);
                 player.setSpace(destination);
                 return;
@@ -363,10 +364,16 @@ public class GameController {
     private void handleReboot(@NotNull Player player) {
 
         player.setRebooting(true);
-        for (int j = board.getStep()+1; j < Player.NO_REGISTERS; j++) {
-            CommandCardField field = player.getProgramField(j);
+        player.setSpace(board.getDeadSpace());
+
+        int i = player == board.getCurrentPlayer() ? board.getStep() + 1: board.getStep();
+
+        while (i < Player.NO_REGISTERS ) {
+            CommandCardField field = player.getProgramField(i);
             field.setCard(null);
+            i++;
         }
+
         for (int j = 0; j < Player.NO_CARDS; j++) {
             CommandCardField field = player.getCardField(j);
             field.setCard(null);
