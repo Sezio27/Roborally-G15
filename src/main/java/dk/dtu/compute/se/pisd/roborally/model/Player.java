@@ -159,6 +159,7 @@ public class Player extends Subject {
     public void setProgramField(int i, CommandCardField field){
         program[i].setCard(field.getCard());
         program[i].setVisible(field.isVisible());
+        notifyChange();
     }
 
     public CommandCardField getCardField(int i) {
@@ -167,7 +168,7 @@ public class Player extends Subject {
     }
     public void setCardField(int i, CommandCardField field){
         cards[i].setCard(field.getCard());
-        cards[i].setVisible(field.isVisible());
+        notifyChange();
     }
 
 

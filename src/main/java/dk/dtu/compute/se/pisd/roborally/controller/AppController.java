@@ -68,10 +68,7 @@ public class AppController implements Observer {
 
             roboRally.createBoardView(gameController);
 
-            System.out.println(board.getSpace(6,6).getAction());
-            ConveyorBelt beltSouth = new ConveyorBelt(Heading.EAST);
-            board.getSpace(6,6).setAction(beltSouth);
-            System.out.println(board.getSpace(6,6).getAction());
+
         }
 
 
