@@ -82,6 +82,7 @@ public class Board extends Subject {
             }
         }
         deadSpace = new Space(this,-1,-1);
+        spaces[2][0].setAction(new Gear());
         numberOfCheckpoints = 0;
 
         this.stepMode = false;

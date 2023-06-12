@@ -104,5 +104,20 @@ class FieldActionTest {
 
         Assertions.assertNotEquals(player1.getSpace(), board.getSpace(4,5));
     }
+    @Test
+    void gearTest(){
+        Board board = gameController.board;
+        Gear gearNorth = new Gear();
+
+        Player player1 = board.getPlayer(0);
+        player1.setSpace(board.getSpace(4,1));
+        board.getSpace(4,2).setAction(gearNorth);
+
+        Heading expectedHeading = player1.getHeading().prev();
+        gameController.moveForward(player1, Heading.SOUTH);
+        gameController.executeFieldActions();
+        System.out.println(player1.getHeading());
+        Assertions.assertEquals(player1.getHeading(), expectedHeading);
+    }
 }
 

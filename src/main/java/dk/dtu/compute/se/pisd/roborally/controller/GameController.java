@@ -185,7 +185,7 @@ public class GameController {
     }
 
 
-    private void executeFieldActions() {
+    public void executeFieldActions() {
 
         List<Player> playersOnConveyors = new ArrayList<>();
 

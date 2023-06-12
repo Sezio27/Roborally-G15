@@ -157,6 +157,9 @@ public class SpaceView extends StackPane implements ViewObserver {
                     putIcon("checkpoint" + number + ".png");
                 }
 
+                if (action instanceof Gear) {
+                    putIcon("gear.png");
+                }
                 //Continue like this
 
             }
