@@ -1,9 +1,6 @@
 package dk.dtu.compute.se.pisd.roborally.controller;
 
-import dk.dtu.compute.se.pisd.roborally.model.Board;
-import dk.dtu.compute.se.pisd.roborally.model.Heading;
-import dk.dtu.compute.se.pisd.roborally.model.Player;
-import dk.dtu.compute.se.pisd.roborally.model.Space;
+import dk.dtu.compute.se.pisd.roborally.model.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,14 +46,74 @@ class GameControllerTest {
 
     @Test
     void pushSuccessful() {
+
         Board board = gameController.board;
 
+        Player player1 = board.getPlayer(0);
+        Player player2 = board.getPlayer(1);
+        player1.setSpace(board.getSpace(4,1));
+        player2.setSpace(board.getSpace(4,2));
 
-        board.getSpace(2,3).addWall(Heading.SOUTH);
+        gameController.moveForward(player1,Heading.SOUTH);
 
+        Assertions.assertEquals(player2.getSpace(), board.getSpace(4,3));
 
     }
 
+    @Test
+    void pushUnsuccesful(){
+        Board board = gameController.board;
 
+        Player player1 = board.getPlayer(0);
+        Player player2 = board.getPlayer(1);
+        player1.setSpace(board.getSpace(4,1));
+        player2.setSpace(board.getSpace(4,2));
+
+        board.getSpace(4,3).addWall(Heading.NORTH);
+        gameController.moveForward(player1,Heading.SOUTH);
+
+        Assertions.assertEquals(player2.getSpace(), board.getSpace(4,2));
+    }
+
+    @Test
+    void moveToWallSpaceSucces(){
+        Board board = gameController.board;
+
+        Player player1 = board.getPlayer(0);
+        player1.setSpace(board.getSpace(4,1));
+
+        board.getSpace(4,2).addWall(Heading.EAST);
+        gameController.moveForward(player1,Heading.SOUTH);
+
+        Assertions.assertEquals(player1.getSpace(), board.getSpace(4,2));
+    }
+
+    @Test
+    void moveToWallSpaceUnsuccesful(){
+        Board board = gameController.board;
+
+        Player player1 = board.getPlayer(0);
+        player1.setSpace(board.getSpace(4,1));
+
+        board.getSpace(4,2).addWall(Heading.NORTH);
+        gameController.moveForward(player1,Heading.SOUTH);
+
+        Assertions.assertEquals(player1.getSpace(), board.getSpace(4,1));
+    }
+
+    @Test
+    void ConveyorSuccesful(){
+        Board board = gameController.board;
+        ConveyorBelt beltSouth = new ConveyorBelt(Heading.SOUTH);
+
+        Player player1 = board.getPlayer(0);
+        player1.setSpace(board.getSpace(4,1));
+
+        board.getSpace(4,2).setAction(beltSouth);
+        beltSouth.doAction(gameController,board.getSpace(4,3));
+        gameController.moveForward(player1, Heading.SOUTH);
+
+        Assertions.assertEquals(player1.getSpace(), board.getSpace(4,2));
+    }
 }
 
