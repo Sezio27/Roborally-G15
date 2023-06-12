@@ -23,18 +23,15 @@ package dk.dtu.compute.se.pisd.roborally.fileaccess;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import dk.dtu.compute.se.pisd.roborally.model.FieldAction;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.model.BoardTemplate;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.model.SpaceTemplate;
-import dk.dtu.compute.se.pisd.roborally.model.Board;
-import dk.dtu.compute.se.pisd.roborally.model.Space;
+import dk.dtu.compute.se.pisd.roborally.model.*;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.util.List;
 
 /**
  * ...
@@ -45,58 +42,154 @@ public class LoadBoard {
 
     private static final String BOARDSFOLDER = "boards";
     private static final String DEFAULTBOARD = "defaultboard";
+    private static final String ACTIVEGAMES = "activeGames";
     private static final String JSON_EXT = "json";
 
     public static Board loadBoard(String boardname) {
         if (boardname == null) {
             boardname = DEFAULTBOARD;
+            System.out.println("printing default");
         }
 
-        ClassLoader classLoader = LoadBoard.class.getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(BOARDSFOLDER + "/" + boardname + "." + JSON_EXT);
-        if (inputStream == null) {
-            // TODO these constants should be defined somewhere
-            return new Board(8,8);
+        File file = new File("src\\main\\resources\\"+BOARDSFOLDER + "\\" + boardname + "." + JSON_EXT);
+
+
+        if (!file.exists()) {
+            System.out.println("File not found - printing default");
+            file = new File("src\\main\\resources\\"+BOARDSFOLDER + "\\" + DEFAULTBOARD + "." + JSON_EXT);
         }
 
-		// In simple cases, we can create a Gson object with new Gson():
+        // In simple cases, we can create a Gson object with new Gson():
         GsonBuilder simpleBuilder = new GsonBuilder().
                 registerTypeAdapter(FieldAction.class, new Adapter<FieldAction>());
         Gson gson = simpleBuilder.create();
 
-		Board result;
-		// FileReader fileReader = null;
+        Board result;
+        // FileReader fileReader = null;
         JsonReader reader = null;
-		try {
-			// fileReader = new FileReader(filename);
-			reader = gson.newJsonReader(new InputStreamReader(inputStream));
-			BoardTemplate template = gson.fromJson(reader, BoardTemplate.class);
+        try {
+            // fileReader = new FileReader(filename);
+            reader = gson.newJsonReader(new FileReader(file));
+            BoardTemplate template = gson.fromJson(reader, BoardTemplate.class);
 
-			result = new Board(template.width, template.height);
-			for (SpaceTemplate spaceTemplate: template.spaces) {
-			    Space space = result.getSpace(spaceTemplate.x, spaceTemplate.y);
-			    if (space != null) {
+            result = new Board(template.width, template.height);
+            for (SpaceTemplate spaceTemplate: template.spaces) {
+                Space space = result.getSpace(spaceTemplate.x, spaceTemplate.y);
+                if (space != null) {
                     space.setAction(spaceTemplate.action);
                     space.getWalls().addAll(spaceTemplate.walls);
                 }
             }
-			reader.close();
-			return result;
-		} catch (IOException e1) {
+
+            reader.close();
+            result.setMap(boardname);
+            return result;
+        } catch (IOException e1) {
             if (reader != null) {
                 try {
                     reader.close();
-                    inputStream = null;
                 } catch (IOException e2) {}
             }
-            if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e2) {}
-			}
-		}
-		return null;
+        }
+        return null;
     }
+
+    public static Board loadActiveBoard(String activeGameName){
+        File file = new File("src\\main\\resources\\"+ ACTIVEGAMES + "\\" + activeGameName + "." + JSON_EXT);
+
+
+        if (!file.exists()) {
+            System.out.println("File not found - printing default");
+            file = new File("src\\main\\resources\\" + BOARDSFOLDER + "\\" + DEFAULTBOARD + "." + JSON_EXT);
+        }
+        // In simple cases, we can create a Gson object with new Gson():
+        GsonBuilder simpleBuilder = new GsonBuilder().
+                registerTypeAdapter(FieldAction.class, new Adapter<FieldAction>());
+        Gson gson = simpleBuilder.create();
+
+        String mapName = "";
+        List<Player> playerList = null;
+        Player current = null;
+        Phase phase = null;
+        Boolean stepmode = null;
+        int step = 0;
+
+        // FileReader fileReader = null;
+        JsonReader reader = null;
+        try {
+            // fileReader = new FileReader(filename);
+            reader = gson.newJsonReader(new FileReader(file));
+            Board template = gson.fromJson(reader, Board.class);
+
+            mapName = template.getMap();
+            playerList = template.getPlayers();
+            current = template.getCurrentPlayer();
+            phase = template.getPhase();
+            stepmode = template.isStepMode();
+            step = template.getStep();
+
+            reader.close();
+
+        } catch (IOException e1) {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e2) {}
+            }
+        }
+
+        Board board = loadBoard(mapName);
+        for(Player p : playerList) {
+
+            Player player = new Player(board, p.getColor(), p.getName());
+
+            board.addPlayer(player);
+            player.setSpace(board.getSpace(p.getSpace().x,p.getSpace().y));
+            player.setHeading(p.getHeading());
+
+            for(int i = 0; i < player.NO_REGISTERS; i++)
+                player.setProgramField(i,p.getProgramField(i));
+            for(int i = 0; i < player.NO_CARDS; i++)
+                player.setCardField(i,p.getCardField(i));
+
+
+            if(player.getName().equals(current.getName()))
+                board.setCurrentPlayer(player);
+
+            player.setSpawnSpace(p.getSpawnSpace());
+
+        }
+        board.setPhase(phase);
+        board.setStepMode(stepmode);
+        board.setStep(step);
+
+        return board;
+    }
+
+    public static String[] getTracks(){
+
+        File folder = new File("src\\main\\resources\\"+BOARDSFOLDER);
+        System.out.println(folder.getAbsolutePath());
+
+        if(folder.listFiles() == null)
+            return null;
+        String[] files = new String[folder.listFiles().length];
+        for(int i = 0; i < folder.listFiles().length; i++)
+            files[i] = folder.listFiles()[i].getName().substring(0,folder.listFiles()[i].getName().length()-5);
+        return files;
+    }
+    public static String[] getActiveGames(){
+        File folder = new File("src\\main\\resources\\"+ACTIVEGAMES);
+
+        if(folder.listFiles() == null)
+            return null;
+        String[] files = new String[folder.listFiles().length];
+        for(int i = 0; i < folder.listFiles().length; i++)
+            files[i] = folder.listFiles()[i].getName().substring(0,folder.listFiles()[i].getName().length()-5);
+        return files;
+
+    }
+
 
     public static void saveBoard(Board board, String name) {
         BoardTemplate template = new BoardTemplate();
@@ -157,5 +250,38 @@ public class LoadBoard {
             }
         }
     }
+    public static void saveCurrentGame(Board board, String name){
+
+        GsonBuilder simpleBuilder = new GsonBuilder().
+                excludeFieldsWithoutExposeAnnotation().
+                setPrettyPrinting();
+        Gson gson = simpleBuilder.create();
+
+
+        String filename =
+                "src\\main\\resources\\" + ACTIVEGAMES + "\\" + name + "." + JSON_EXT;
+        FileWriter fileWriter = null;
+        JsonWriter writer = null;
+
+        try {
+            fileWriter = new FileWriter(filename);
+            writer = gson.newJsonWriter(fileWriter);
+            gson.toJson(board, board.getClass(), writer);
+            writer.close();
+        } catch (IOException e1) {
+            if (writer != null) {
+                try {
+                    writer.close();
+                    fileWriter = null;
+                } catch (IOException e2) {}
+            }
+            if (fileWriter != null) {
+                try {
+                    fileWriter.close();
+                } catch (IOException e2) {}
+            }
+        }
+    }
+
 
 }

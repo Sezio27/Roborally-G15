@@ -21,6 +21,7 @@
  */
 package dk.dtu.compute.se.pisd.roborally.model;
 
+import com.google.gson.annotations.Expose;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.view.SpaceView;
 import org.jetbrains.annotations.NotNull;
@@ -47,14 +48,16 @@ public class Board extends Subject {
 
     private final Space[][] spaces;
 
+    @Expose
     private final List<Player> players = new ArrayList<>();
 
+    @Expose
     private Player current;
-
+    @Expose
     private Phase phase = INITIALISATION;
-
+    @Expose
     private int step = 0;
-
+    @Expose
     private boolean stepMode;
 
     private int numberOfCheckpoints;
@@ -63,9 +66,12 @@ public class Board extends Subject {
 
     private Space deadSpace;
 
+    @Expose
+    private String map;
 
     public Board(int width, int height, @NotNull String boardName) {
         this.boardName = boardName;
+        map = boardName;
         this.width = width;
         this.height = height;
         spaces = new Space[width][height];
@@ -77,7 +83,6 @@ public class Board extends Subject {
         }
         deadSpace = new Space(this,-1,-1);
         numberOfCheckpoints = 0;
-        testBoard();
 
         this.stepMode = false;
 
@@ -102,37 +107,6 @@ public class Board extends Subject {
     public void putCheckPoint(Space space) {
         numberOfCheckpoints++;
         space.setAction(new Checkpoint(numberOfCheckpoints));
-    }
-
-
-    //TO BE DELETED
-    private void testBoard() {
-
-        //Starting Spaces
-
-
-        //Walls
-        spaces[3][1].addWall(Heading.WEST);
-        spaces[2][4].addWall(Heading.WEST);
-
-        //Conveyor Belts
-        ConveyorBelt beltNorth = new ConveyorBelt(Heading.NORTH);
-        ConveyorBelt beltSouth = new ConveyorBelt(Heading.SOUTH);
-        ConveyorBelt beltWest = new ConveyorBelt(Heading.WEST);
-        ConveyorBelt beltEast = new ConveyorBelt(Heading.EAST);
-        spaces[0][1].setAction(beltSouth);
-        spaces[0][2].setAction(beltSouth);
-        spaces[0][3].setAction(beltSouth);
-        spaces[0][4].setAction(beltEast);
-        spaces[1][4].setAction(beltEast);
-        spaces[2][4].setAction(beltEast);
-
-        //Checkpoints
-        putCheckPoint(spaces[1][2]);
-        putCheckPoint(spaces[3][1]);
-        putCheckPoint(spaces[3][4]);
-        putCheckPoint(spaces[5][6]);
-
     }
 
     public Integer getGameId() {
@@ -272,6 +246,10 @@ public class Board extends Subject {
         return deadSpace;
     }
 
+    public Space[][] getSpaces() {
+        return spaces;
+    }
+
     public String getStatusMessage() {
         // this is actually a view aspect, but for making assignment V1 easy for
         // the students, this method gives a string representation of the current
@@ -284,5 +262,11 @@ public class Board extends Subject {
     }
 
 
+    public void setMap(String m) {
+        map = m;
+    }
 
+    public String getMap() {
+        return map;
+    }
 }

@@ -64,7 +64,7 @@ public abstract class Subject {
 	final public void detach(Observer observer) {
 		observers.remove(observer);
 	}
-	
+
 	/**
 	 * This method must be called from methods of concrete subclasses
 	 * of this subject class whenever its state is changed (in a way
