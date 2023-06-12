@@ -37,12 +37,18 @@ public class AppController implements Observer {
             }
         }
 
-
         int playerCount = 0;
         while (playerCount < 1) playerCount = selectPlayerCount();
-        createAndStartDefault(playerCount);
 
+        String[] boards = LoadBoard.getTracks();
 
+        if (boards.length < 1) {
+            createAndStartDefault(playerCount);
+        } else {
+            selectBoard(boards);
+            Board board = LoadBoard.loadBoard(selectBoard(boards));
+            gameController = new GameController(board);
+        }
     }
 
     private void createAndStartDefault(int playerCount) {
@@ -71,31 +77,26 @@ public class AppController implements Observer {
 
     }
 
-    private String selectBoard() {
-        String[] list = LoadBoard.getTracks();
+    private String selectBoard(String[] boards) {
 
-        if (LoadBoard.getTracks() != null) {
-            ChoiceDialog<String> dialog = new ChoiceDialog<>(list[0], list);
-            dialog.setTitle("Track selection");
-            dialog.setHeaderText("Pick a track");
-            Optional<String> result = dialog.showAndWait();
 
-            if (result.isPresent()) {
-                String track = result.get();
-                System.out.println("Track chosen: " + track);
-                return track;
-            }
+        if (boards == null) {
+            showAlert("No tracks");
+            return null;
         }
 
-        System.out.println("Could not find tracks to load");
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setHeaderText("No saved tracks");
-        alert.showAndWait();
-        return null;
-
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(boards[0], boards);
+        dialog.setTitle("Track selection");
+        dialog.setHeaderText("Pick a track");
+        Optional<String> result = dialog.showAndWait();
+        String track = "";
+        if (result.isPresent()) {
+            track = result.get();
+            System.out.println("Track chosen: " + track);
+        }
+        return track;
     }
 
-    // End of temporary
 
     private int selectPlayerCount() {
         ChoiceDialog<Integer> dialog = new ChoiceDialog<>(PLAYER_NUMBER_OPTIONS.get(0), PLAYER_NUMBER_OPTIONS);
@@ -108,45 +109,47 @@ public class AppController implements Observer {
         return -1;
     }
 
-    public void saveGame() {
+    private void showAlert(String message) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setHeaderText(message);
+        alert.showAndWait();
+    }
+
+    public void saveGame(){
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Save game");
         dialog.setHeaderText("save as");
 
-        String result = "";
-        result = dialog.showAndWait().get();
+        String result = dialog.showAndWait().get();
 
-        if (!result.equals("")) {
-            LoadBoard.saveCurrentGame(this.gameController.board, result);
-            System.out.println("Saved as " + result);
-        }
-    }
-
-    public void loadGame() {
-        String[] list = LoadBoard.getActiveGames();
-        if (list == null) {
-            System.out.println("Aint no active games son");
+        if (result.equals("") ) {
+            showAlert("Please enter a name for the saved game");
             return;
         }
 
-        ChoiceDialog<String> dialog =
-                new ChoiceDialog<>(list[0], list);
-        dialog.setTitle("Game selection");
-        dialog.setHeaderText("Pick an active game");
+        if (Arrays.asList(LoadBoard.getTracks()).contains(result)) {
+            showAlert("Saving and overriding " + result);
+        }
 
-        Optional<String> result = dialog.showAndWait();
-        String track = "";
-        if (result.isPresent())
-            track = result.get();
-        System.out.println("Du har valgt bane: " + track);
+        LoadBoard.saveCurrentGame(this.gameController.board, result);
+        System.out.println("Saved as " + result);
 
+    }
+
+    public void loadGame() {
+
+        String track = selectBoard(LoadBoard.getActiveGames());
+
+        if (track == null || track.equals("")) return;
+        System.out.println((track));
         Board board = LoadBoard.loadActiveBoard(track);
         gameController = new GameController(board);
 
-
         roboRally.createBoardView(gameController);
     }
+  {
 
+    }
 
     /**
      * Stop playing the current game, giving the user the option to save
@@ -200,10 +203,12 @@ public class AppController implements Observer {
     }
 
 
-    class UnableToStartException extends Exception {
-        public UnableToStartException() {
-            super("Unable to start game");
+    class InputException extends Exception {
+        public InputException(String message) {
+            super(message);
+
         }
+
     }
 
 }

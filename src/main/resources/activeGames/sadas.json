@@ -56,7 +56,9 @@
             "command": "LEFT"
           }
         }
-      ]
+      ],
+      "currentCheckpoint": 0,
+      "rebooting": false
     },
     {
       "name": "Player 2",
@@ -114,7 +116,9 @@
             "command": "FORWARD"
           }
         }
-      ]
+      ],
+      "currentCheckpoint": 0,
+      "rebooting": false
     },
     {
       "name": "Player 3",
@@ -172,7 +176,9 @@
             "command": "RIGHT"
           }
         }
-      ]
+      ],
+      "currentCheckpoint": 0,
+      "rebooting": false
     }
   ],
   "current": {
@@ -231,7 +237,9 @@
           "command": "LEFT"
         }
       }
-    ]
+    ],
+    "currentCheckpoint": 0,
+    "rebooting": false
   },
   "phase": "ACTIVATION",
   "step": 0,
