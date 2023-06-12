@@ -52,6 +52,34 @@
     },
     {
       "walls": [
+        "NORTH"
+      ],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
+        "INSTANCE": {
+          "heading": "EAST"
+        }
+      },
+      "x": 2,
+      "y": 0
+    },
+    {
+      "walls": [
+        "SOUTH"
+      ],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
+        "INSTANCE": {
+          "heading": "EAST"
+        }
+      },
+      "x": 2,
+      "y": 5
+    },
+    {
+      "walls": [
         "NORTH",
         "EAST"
       ],
