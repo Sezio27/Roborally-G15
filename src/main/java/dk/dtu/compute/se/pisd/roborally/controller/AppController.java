@@ -39,9 +39,16 @@ public class AppController implements Observer {
 
         int playerCount = 0;
         while (playerCount < 1) playerCount = selectPlayerCount();
-        createAndStartDefault(playerCount);
 
+        String[] boards = LoadBoard.getTracks();
 
+        if (boards.length < 1) {
+            createAndStartDefault(playerCount);
+        } else {
+            selectBoard(boards);
+            Board board = LoadBoard.loadBoard(selectBoard(boards));
+            gameController = new GameController(board);
+        }
     }
 
     private void createAndStartDefault(int playerCount) {
@@ -74,7 +81,7 @@ public class AppController implements Observer {
 
 
         if (boards == null) {
-            showAlert("No saved tracks");
+            showAlert("No tracks");
             return null;
         }
 
