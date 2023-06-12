@@ -45,9 +45,15 @@ public class AppController implements Observer {
         if (boards.length < 1) {
             createAndStartDefault(playerCount);
         } else {
-            selectBoard(boards);
             Board board = LoadBoard.loadBoard(selectBoard(boards));
+
             gameController = new GameController(board);
+
+            createPlayers(board,playerCount);
+            gameController.initializeGame(playerCount);
+            gameController.startProgrammingPhase();
+
+            roboRally.createBoardView(gameController);
         }
     }
 
