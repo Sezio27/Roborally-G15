@@ -21,6 +21,7 @@
  */
 package dk.dtu.compute.se.pisd.roborally.model;
 
+import com.google.gson.annotations.Expose;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,23 +47,28 @@ public class Board extends Subject {
 
     private final Space[][] spaces;
 
+    @Expose
     private final List<Player> players = new ArrayList<>();
 
+    @Expose
     private Player current;
-
+    @Expose
     private Phase phase = INITIALISATION;
-
+    @Expose
     private int step = 0;
-
+    @Expose
     private boolean stepMode;
 
     private int numberOfCheckpoints;
 
     private Space[] startSpaces;
 
+    @Expose
+    private String map;
 
     public Board(int width, int height, @NotNull String boardName) {
         this.boardName = boardName;
+        map = boardName;
         this.width = width;
         this.height = height;
         spaces = new Space[width][height];
@@ -73,7 +79,7 @@ public class Board extends Subject {
             }
         }
         numberOfCheckpoints = 0;
-        testBoard();
+        //testBoard();
 
         this.stepMode = false;
 
@@ -280,4 +286,11 @@ public class Board extends Subject {
     }
 
 
+    public void setMap(String m) {
+        map = m;
+    }
+
+    public String getMap() {
+        return map;
+    }
 }

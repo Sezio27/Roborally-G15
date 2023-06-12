@@ -21,6 +21,7 @@
  */
 package dk.dtu.compute.se.pisd.roborally.model;
 
+import com.google.gson.annotations.Expose;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 
 import java.util.ArrayList;
@@ -43,7 +44,9 @@ public class Space extends Subject {
     /* Currently not supporting multiple field actions on a single space
      private List<FieldAction> actions = new ArrayList<>();
      */
+    @Expose
     public final int x;
+    @Expose
     public final int y;
 
     private Player player;
