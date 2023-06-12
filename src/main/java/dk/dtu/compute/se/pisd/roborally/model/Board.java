@@ -108,6 +108,9 @@ public class Board extends Subject {
         numberOfCheckpoints++;
         space.setAction(new Checkpoint(numberOfCheckpoints));
     }
+    public void setNumberOfCheckpoints(int i){
+        numberOfCheckpoints = i;
+    }
 
     public Integer getGameId() {
         return gameId;

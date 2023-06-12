@@ -6,16 +6,27 @@
       "walls": [
         "SOUTH"
       ],
-      "action":
-        {
-          "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
-          "INSTANCE": {
-            "heading": "WEST"
-          }
-        }
-      ,
+    "action": {
+      "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.Checkpoint",
+      "INSTANCE": {
+        "number": 4
+      }
+    },
       "x": 0,
       "y": 0
+    },
+    {
+      "walls": [],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.Checkpoint",
+        "INSTANCE": {
+          "number": 2
+        }
+      }
+    ,
+      "x": 0,
+      "y": 1
     },
     {
       "walls": [
@@ -173,6 +184,19 @@
       "y": 5
     },
     {
+      "walls": [],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.Checkpoint",
+        "INSTANCE": {
+          "number": 1
+        }
+      }
+    ,
+      "x": 6,
+      "y": 5
+    },
+    {
       "walls": [
         "NORTH"
       ],
@@ -201,6 +225,95 @@
       ,
       "x": 7,
       "y": 7
+    },
+    {
+      "walls": [
+        "EAST"
+      ],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
+        "INSTANCE": {
+          "heading": "SOUTH"
+        }
+      }
+    ,
+      "x": 7,
+      "y": 7
+    },
+    {
+      "walls": [
+        "SOUTH"
+      ],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
+        "INSTANCE": {
+          "heading": "WEST"
+        }
+      }
+    ,
+      "x": 5,
+      "y": 0
+    },
+    {
+      "walls": [
+        "SOUTH"
+      ],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
+        "INSTANCE": {
+          "heading": "WEST"
+        }
+      }
+    ,
+      "x": 6,
+      "y": 0
+    },
+    {
+      "walls": [
+        "WEST"
+      ],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
+        "INSTANCE": {
+          "heading": "SOUTH"
+        }
+      }
+    ,
+      "x": 7,
+      "y": 2
+    },
+    {
+      "walls": [
+        "WEST"
+      ],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
+        "INSTANCE": {
+          "heading": "SOUTH"
+        }
+      }
+    ,
+      "x": 7,
+      "y": 1
+    },
+    {
+      "walls": [
+      ],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.Checkpoint",
+        "INSTANCE": {
+          "number": 3
+        }
+      }
+    ,
+      "x": 7,
+      "y": 0
     }
   ]
 }

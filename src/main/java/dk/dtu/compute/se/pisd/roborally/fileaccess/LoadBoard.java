@@ -73,15 +73,19 @@ public class LoadBoard {
             BoardTemplate template = gson.fromJson(reader, BoardTemplate.class);
 
             result = new Board(template.width, template.height);
+            int numberOfCheckpoints = 0;
             for (SpaceTemplate spaceTemplate: template.spaces) {
                 Space space = result.getSpace(spaceTemplate.x, spaceTemplate.y);
                 if (space != null) {
                     space.setAction(spaceTemplate.action);
+                    if(spaceTemplate.action.getClass().getName().equals("dk.dtu.compute.se.pisd.roborally.model.Checkpoint"))
+                        numberOfCheckpoints++;
                     space.getWalls().addAll(spaceTemplate.walls);
                 }
             }
 
             reader.close();
+            result.setNumberOfCheckpoints(numberOfCheckpoints);
             result.setMap(boardname);
             return result;
         } catch (IOException e1) {
