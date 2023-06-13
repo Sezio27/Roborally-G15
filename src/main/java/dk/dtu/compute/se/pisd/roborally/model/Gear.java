@@ -5,14 +5,23 @@ import org.jetbrains.annotations.NotNull;
 
 public class Gear extends FieldAction{
 
-
-    public Gear(){}
+    private boolean clockwise;
+    public Gear(boolean clockwise){
+        this.clockwise = clockwise;
+    }
 
 
     public boolean doAction(@NotNull GameController gameController, @NotNull Space space){
         Player player = space.getPlayer();
-        player.setHeading(player.getHeading().prev());
-        //Currently only going clockwise
+
+        if (player == null) return false;
+
+        Heading heading = player.getHeading();
+        if (clockwise) {
+            player.setHeading(heading.next());
+        } else {
+            player.setHeading(heading.prev());
+        }
         return true;
     }
 

@@ -31,7 +31,6 @@ import dk.dtu.compute.se.pisd.roborally.model.*;
 
 import java.io.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * ...
@@ -112,7 +111,6 @@ public class LoadBoard {
         if (!file.exists()) {
             return null;
         }
-        // In simple cases, we can create a Gson object with new Gson():
         GsonBuilder simpleBuilder = new GsonBuilder().
                 registerTypeAdapter(FieldAction.class, new Adapter<FieldAction>());
         Gson gson = simpleBuilder.create();
@@ -124,10 +122,9 @@ public class LoadBoard {
         Boolean stepmode = null;
         int step = 0;
 
-        // FileReader fileReader = null;
+
         JsonReader reader = null;
         try {
-            // fileReader = new FileReader(filename);
             reader = gson.newJsonReader(new FileReader(file));
             Board template = gson.fromJson(reader, Board.class);
 
@@ -234,59 +231,24 @@ public class LoadBoard {
                 setPrettyPrinting();
         Gson gson = simpleBuilder.create();
 
-        FileWriter fileWriter = null;
-        JsonWriter writer = null;
-
-        try {
-            fileWriter = new FileWriter(filename);
-            writer = gson.newJsonWriter(fileWriter);
-            gson.toJson(template, template.getClass(), writer);
-            writer.close();
-        } catch (IOException e1) {
-            if (writer != null) {
-                try {
-                    writer.close();
-                    fileWriter = null;
-                } catch (IOException e2) {}
-            }
-            if (fileWriter != null) {
-                try {
-                    fileWriter.close();
-                } catch (IOException e2) {}
-            }
-        }
+        writeFile(template, filename, gson);
     }
     public static void saveCurrentGame(Board board, String name){
-
+        String filename = ACTIVEGAMES + File.separator + name + "." + JSON_EXT;
         GsonBuilder simpleBuilder = new GsonBuilder().
                 excludeFieldsWithoutExposeAnnotation().
                 setPrettyPrinting();
         Gson gson = simpleBuilder.create();
 
-
-        String filename = ACTIVEGAMES + File.separator + name + "." + JSON_EXT;
-        FileWriter fileWriter = null;
-        JsonWriter writer = null;
-
-        try {
-            fileWriter = new FileWriter(filename);
-            writer = gson.newJsonWriter(fileWriter);
-            gson.toJson(board, board.getClass(), writer);
-            writer.close();
-        } catch (IOException e1) {
-            if (writer != null) {
-                try {
-                    writer.close();
-                    fileWriter = null;
-                } catch (IOException e2) {}
-            }
-            if (fileWriter != null) {
-                try {
-                    fileWriter.close();
-                } catch (IOException e2) {}
-            }
-        }
+        writeFile(board, filename, gson);
     }
 
-
+    private static  <T> void writeFile(T object, String filename, Gson gson) {
+        try (FileWriter fileWriter = new FileWriter(filename);
+             JsonWriter writer = gson.newJsonWriter(fileWriter)) {
+            gson.toJson(object, object.getClass(), writer);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
 }

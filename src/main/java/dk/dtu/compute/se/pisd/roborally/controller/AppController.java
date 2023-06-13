@@ -73,6 +73,8 @@ public class AppController implements Observer {
         board.getSpace(3, 3).addWall(Heading.WEST);
         board.getSpace(3, 4).addWall(Heading.WEST);
         board.getSpace(3, 6).addWall(Heading.WEST);
+        board.getSpace(2, 0).setAction(new Gear(false));
+        board.getSpace(2, 2).setAction(new Gear(true));
         board.getSpace(3, 5).setAction(new ConveyorBelt(Heading.WEST));
         board.getSpace(0, 0).setAction(new ConveyorBelt(Heading.WEST));
         board.getSpace(2, 5).setAction(new ConveyorBelt(Heading.WEST));

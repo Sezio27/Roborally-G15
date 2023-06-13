@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 class FieldActionTest {
 
     private final int TEST_WIDTH = 8;
@@ -23,7 +25,7 @@ class FieldActionTest {
             Player player = new Player(board, null, "Player " + (i + 1));
             board.addPlayer(player);
         }
-        gameController.initializeGame(4);
+        gameController.initialize(4, Arrays.asList("red", "green", "blue", "orange"));
     }
 
     @AfterEach
@@ -107,7 +109,7 @@ class FieldActionTest {
     @Test
     void gearTest(){
         Board board = gameController.board;
-        Gear gearNorth = new Gear();
+        Gear gearNorth = new Gear(false);
 
         Player player1 = board.getPlayer(0);
         player1.setSpace(board.getSpace(4,1));

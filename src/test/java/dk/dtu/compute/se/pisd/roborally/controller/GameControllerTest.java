@@ -114,7 +114,7 @@ class GameControllerTest {
     void OutOfMap(){
         Board board = gameController.board;
 
-        Space startSpace1 = board.getStartSpaces()[0];
+        Space startSpace1 = board.getSpawnSpaces().get(0);
         Player player1 = board.getPlayer(0);
         player1.setSpace(board.getSpace(1,8));
 
@@ -148,7 +148,6 @@ class GameControllerTest {
         Player player1 = board.getPlayer(0);
         Player player2 = board.getPlayer(1);
 
-        board.putCheckPoint(board.getSpace(3,3));
         player1.setSpace(board.getSpace(1,3));
         player2.setSpace(board.getSpace(0,2));
         gameController.startProgrammingPhase();
@@ -160,8 +159,7 @@ class GameControllerTest {
     void checkPointIfConditionNotMet(){
         Board board = gameController.board;
         Player player1 = board.getPlayer(0);
-
-        board.putCheckPoint(board.getSpace(4,4));
+        board.getSpace(4,4).setAction(new Checkpoint(2));
         player1.setSpace(board.getSpace(4,3));
         gameController.moveForward(player1,Heading.SOUTH);
 
