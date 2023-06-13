@@ -25,7 +25,7 @@ import com.google.gson.annotations.Expose;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 
 /**
- * ...
+ * Class representing a field for CommandCards for a specific Player.
  *
  * @author Ekkart Kindler, ekki@dtu.dk
  *
@@ -33,12 +33,14 @@ import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 public class CommandCardField extends Subject {
 
     final public Player player;
-
     @Expose
     private CommandCard card;
-
     private boolean visible;
-
+    /**
+     * Constructs a CommandCardField for the specified Player.
+     *
+     * @param player the Player to whom this CommandCardField belongs
+     */
     public CommandCardField(Player player) {
         this.player = player;
         this. card = null;
@@ -48,7 +50,11 @@ public class CommandCardField extends Subject {
     public CommandCard getCard() {
         return card;
     }
-
+    /**
+     * Sets the CommandCard for this field and notifies observers of the change.
+     *
+     * @param card the CommandCard to set
+     */
     public void setCard(CommandCard card) {
         if (card != this.card) {
             this.card = card;
@@ -59,7 +65,11 @@ public class CommandCardField extends Subject {
     public boolean isVisible() {
         return visible;
     }
-
+    /**
+     * Sets the visibility of this CommandCardField and notifies observers of the change.
+     *
+     * @param visible the visibility to set
+     */
     public void setVisible(boolean visible) {
         if (visible != this.visible) {
             this.visible = visible;

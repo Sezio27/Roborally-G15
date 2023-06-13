@@ -26,7 +26,7 @@ import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * ...
+ * Class representing a CommandCard with a specified Command.
  *
  * @author Ekkart Kindler, ekki@dtu.dk
  *
@@ -35,7 +35,11 @@ public class CommandCard extends Subject {
 
     @Expose
     final public Command command;
-
+    /**
+     * Constructs a CommandCard with the specified Command.
+     *
+     * @param command the Command for this CommandCard
+     */
     public CommandCard(@NotNull Command command) {
         this.command = command;
     }

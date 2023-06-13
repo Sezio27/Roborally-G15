@@ -24,26 +24,46 @@ package dk.dtu.compute.se.pisd.roborally.controller;
 import dk.dtu.compute.se.pisd.roborally.model.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 /**
- * ...
+ * This class is responsible for managing the game control logic and state which includes:
+ * <ul>
+ *     <li>Initializing the {@link Board} and {@link Player}s
+ *     <li>Executing the game {@link Phase}s
+ *     <li>Handling {@link Player} movements, their {@link CommandCard}s and turns
+ *     <li>Performing {@link FieldAction}s which currently includes {@link ConveyorBelt}, {@link Gear} and {@link Checkpoint}
+ *     <li>Ensuring proper interaction of all game elements
+ *     <li>Rebooting
+ *     <li>Checking for win conditions
+ * </ul>
  *
+ * @author Jakob Jacosen, s204502
  * @author Ekkart Kindler, ekki@dtu.dk
  */
 public class GameController {
 
     final public Board board;
 
+    /**
+     * Creates a new GameController with the provided board.
+     *
+     * @param board the game board
+     */
     public GameController(@NotNull Board board) {
         this.board = board;
     }
 
+    /**
+     * Initializes a game with the given number of players and their colors.
+     * If no spawn spaces exist on the board, it sets default spawn spaces.
+     * It creates players with given colors, sets their spawn spaces, and adds them to the board.
+     * Finally, it starts the programming phase.
+     *
+     * @param playerCount the number of players
+     * @param colors      the colors of the players
+     */
     public void initialize(int playerCount, List<String> colors) {
         if (board.getSpawnSpaces().isEmpty()) board.setSpawnSpacesDefault(playerCount);
 
@@ -56,6 +76,8 @@ public class GameController {
         }
         startProgrammingPhase();
     }
+
+    // Not to be used in the actual game. Just for testing purposes
     public void moveCurrentPlayerToSpace(@NotNull Space space) {
 
         if (space != null && space.board == board) {
@@ -69,6 +91,14 @@ public class GameController {
 
     }
 
+    /**
+     * Updates the checkpoint for the given player and checks if the player has won the game.
+     * It also sets the new spawn space for the player.
+     *
+     * @param player the player which checkpoint and spawnSpace to update
+     * @param space  the space with the checkpoint action and the new spawn space for the player
+     * @param number the checkpoint number
+     */
     public void updateCheckpoint(@NotNull Player player, Space space, int number) {
         player.updateCheckpoint();
         System.out.println(player.getName() + " - new checkpoint: " + number);
@@ -79,10 +109,16 @@ public class GameController {
         player.setSpawnSpace(space);
     }
 
+    // Currently only prints out who won the game
     public void handleWin(@NotNull Player player) {
         System.out.println(player.getName() + " has won!");
     }
 
+    /**
+     * Starts the programming phase by setting the game phase to PROGRAMMING and resetting the step to zero.
+     * For each player, if they are rebooting, it stops the rebooting and respawns them. It then clears their
+     * program fields and assigns random command cards to their empty card fields.
+     */
     public void startProgrammingPhase() {
         board.setPhase(Phase.PROGRAMMING);
         board.setCurrentPlayer(board.getPlayer(0));
@@ -102,7 +138,7 @@ public class GameController {
                 }
                 for (int j = 0; j < Player.NO_CARDS; j++) {
                     CommandCardField field = player.getCardField(j);
-                    if(field.getCard() == null)
+                    if (field.getCard() == null)
                         field.setCard(generateRandomCommandCard());
                     field.setVisible(true);
                 }
@@ -110,12 +146,22 @@ public class GameController {
         }
     }
 
+    /**
+     * Generates a random command card using the {@link Command} enum values.
+     *
+     * @return the newly generated command card
+     */
     private CommandCard generateRandomCommandCard() {
         Command[] commands = Command.values();
         int random = (int) (Math.random() * commands.length);
         return new CommandCard(commands[random]);
     }
 
+    /**
+     * Finishes the programming phase by making the program fields invisible, making the first program field
+     * visible, and setting the game phase to ACTIVATION. It then resets the current player to the first player
+     * and the step to zero.
+     */
     public void finishProgrammingPhase() {
         makeProgramFieldsInvisible();
         makeProgramFieldsVisible(0);
@@ -124,6 +170,11 @@ public class GameController {
         board.setStep(0);
     }
 
+    /**
+     * Makes the program fields for the specified register visible to all players.
+     *
+     * @param register the register whose fields should be made visible
+     */
     private void makeProgramFieldsVisible(int register) {
         if (register >= 0 && register < Player.NO_REGISTERS) {
             for (int i = 0; i < board.getPlayersNumber(); i++) {
@@ -133,7 +184,9 @@ public class GameController {
             }
         }
     }
-
+    /**
+     * Makes all cards on the registers of each player invisible
+     */
     private void makeProgramFieldsInvisible() {
         for (int i = 0; i < board.getPlayersNumber(); i++) {
             Player player = board.getPlayer(i);
@@ -143,23 +196,38 @@ public class GameController {
             }
         }
     }
-
+    /**
+     * Executes all players' programming cards in their registers in order.
+     */
     public void executePrograms() {
         board.setStepMode(false);
         continuePrograms();
     }
-
+    /**
+     * Executes a program card in the current players register
+     */
     public void executeStep() {
         board.setStepMode(true);
         continuePrograms();
     }
 
+    /**
+     * Continues the execution of players' programs. If the game is in step mode, it only executes the next step.
+     */
     private void continuePrograms() {
         do {
             executeNextStep();
         } while (board.getPhase() == Phase.ACTIVATION && !board.isStepMode());
     }
-
+    /**
+     * Handles the conveyor move for players on conveyor belts.
+     * It determines the final destination of each player. If two or more players has the same destination then
+     * they will not be moved, otherwise the players on the spaces which conditions
+     * from <code>doAction()</code> in {@link ConveyorBelt} is satisfied, will be moved.
+     * If a player is moved outside of board <code>handleReboot</code> is called on that player
+     *
+     * @param players the list of players on the conveyor belts
+     */
     private void handleConveyorMove(List<Player> players) {
 
         Map<Space, List<Player>> destinationMap = new HashMap<>();
@@ -180,17 +248,20 @@ public class GameController {
         }
 
 
-            //Only move players with unique destinations
-            destinationMap.entrySet().stream()
-                    .filter(entry -> entry.getValue().size() == 1)
-                    .forEach(entry -> {
-                        Player player = entry.getValue().get(0);
-                        Space destination = entry.getKey();
-                        player.setSpace(destination);
-                    });
+        //Only move players with unique destinations
+        destinationMap.entrySet().stream()
+                .filter(entry -> entry.getValue().size() == 1)
+                .forEach(entry -> {
+                    Player player = entry.getValue().get(0);
+                    Space destination = entry.getKey();
+                    player.setSpace(destination);
+                });
     }
 
-
+    /**
+     * Executes the field actions for each player's current field if possible.
+     * Should be changed in the future to allow for field actions which does not have players on them
+     */
     public void executeFieldActions() {
 
         List<Player> playersOnConveyors = new ArrayList<>();
@@ -213,7 +284,10 @@ public class GameController {
         }
         if (!playersOnConveyors.isEmpty()) handleConveyorMove(playersOnConveyors);
     }
-
+    /**
+     * If the current player is not rebooting, it executes the player's program card in the register corresponding to the step.
+     * If the card is interactive the command in the register is not executed instead, the game phase is changed to PLAYER_INTERACTION
+     */
     private void executeNextStep() {
 
         Player currentPlayer = board.getCurrentPlayer();
@@ -247,7 +321,12 @@ public class GameController {
             assert false;
         }
     }
-
+    /**
+     * Sets the next player to the current player and increments the step.
+     * If the current player is the last player and the step less than the total number of registers,
+     * field actions will be executed and the next card of the next register will be visible.
+     * If it is the last step, it starts the programming phase.
+     */
     private void finishCommand() {
         int nextPlayerNumber = board.getPlayerNumber(board.getCurrentPlayer()) + 1;
 
@@ -266,7 +345,12 @@ public class GameController {
         }
     }
 
-    // XXX: V2
+    /**
+     * Executes the specified command for the given player.
+     *
+     * @param player the player for whom to execute the command
+     * @param command the command to be executed
+     */
     private void executeCommand(@NotNull Player player, Command command) {
         if (player != null && player.board == board && command != null) {
 
@@ -289,7 +373,14 @@ public class GameController {
 
         }
     }
-
+    /**
+     * Used to handle interactive commands.
+     * Executes the specified command for the given player
+     * If the game is not in step mode it continues the execution of all cards in the rest of every player's registers.
+     *
+     * @param player the player for whom to execute the command
+     * @param option the command to be executed
+     */
     public void executeCommandOptionAndContinue(@NotNull Player player, Command option) {
 
         if (player.board == board && player == board.getCurrentPlayer()) {
@@ -303,7 +394,12 @@ public class GameController {
             }
         }
     }
-
+    /**
+     * Moves the player in the direction of the specified heading if possible - handled by <code>moveToSpace</code>
+     *
+     * @param player the player to be moved
+     * @param heading the direction of movement
+     */
     public void moveForward(@NotNull Player player, Heading heading) {
         if (player.board == board && !player.isRebooting()) {
             Space source = player.getSpace();
@@ -319,13 +415,33 @@ public class GameController {
         }
     }
 
-    // *Include in report*
+    /**
+     * Moves the player to the specified space in the given direction if the following conditions are <strong>not</strong> met:
+     *
+     * <ul>
+     *     <li> The target space is out of the boards boundaries - handle reboot on the player
+     *     <li> The source space has a wall in the same heading of this player's heading
+     *     <li> The target space has a wall in the opposite heading of this player's heading
+     * </ul>
+     * This method is recursively called, to allow for pushing mechanics if the target space has a player,
+     * with the new player, the target as the new source, the destination of the other player, but maintaining the same heading.
+     * Because of the recursive nature of this method, a moveCount is used to avoid possible infinite cyclic recursion.
+
+     * If the move is not possible, it throws an ImpossibleMoveException.
+     *
+     * @param player the player to be moved
+     * @param source the space from which the player is moving
+     * @param destination the space to which the player is moving
+     * @param heading the direction of movement
+     * @param moveCount the count of moves (used to avoid infinite recursion)
+     * @throws ImpossibleMoveException if the move is not possible
+     */
     private void moveToSpace(@NotNull Player player, @NotNull Space source, Space destination, @NotNull Heading heading, int moveCount) throws ImpossibleMoveException {
         //Or a pit
         if (destination == board.getDeadSpace()) {
             handleReboot(player);
             return;
-        };
+        }
 
         if (source.getWalls().contains(heading) || destination.getWalls().contains(heading.opposing())) return;
 
@@ -346,15 +462,20 @@ public class GameController {
         player.setSpace(destination);
 
     }
-
+    /**
+     * Handles the rebooting of a player. Sets the player's space to the dead space,
+     * status to rebooting and clears the rest of the programming cards in their registers and all their command cards.
+     *
+     * @param player the player to be rebooted
+     */
     private void handleReboot(@NotNull Player player) {
 
         player.setRebooting(true);
         player.setSpace(board.getDeadSpace());
 
-        int i = player == board.getCurrentPlayer() ? board.getStep() + 1: board.getStep();
+        int i = player == board.getCurrentPlayer() ? board.getStep() + 1 : board.getStep();
 
-        while (i < Player.NO_REGISTERS ) {
+        while (i < Player.NO_REGISTERS) {
             CommandCardField field = player.getProgramField(i);
             field.setCard(null);
             i++;
@@ -368,24 +489,42 @@ public class GameController {
 
 
     }
-
+    /**
+     * Moves the player two steps forward in the current heading.
+     *
+     * @param player the player to be moved
+     */
     public void fastForward(@NotNull Player player) {
         moveForward(player, player.getHeading());
         moveForward(player, player.getHeading());
     }
-
+    /**
+     * Turns the player's heading to the right (clockwise).
+     *
+     * @param player the player to be turned
+     */
     public void turnRight(@NotNull Player player) {
         if (player != null && player.board == board) {
             player.setHeading(player.getHeading().next());
         }
     }
-
+    /**
+     * Turns the player's heading to the left (counterclockwise).
+     *
+     * @param player the player to be turned
+     */
     public void turnLeft(@NotNull Player player) {
         if (player != null && player.board == board) {
             player.setHeading(player.getHeading().prev());
         }
     }
-
+    /**
+     * Moves the card from the source field to the target field.
+     *
+     * @param source the source field
+     * @param target the target field
+     * @return true if the move is successful, false otherwise
+     */
     public boolean moveCards(@NotNull CommandCardField source, @NotNull CommandCardField target) {
         CommandCard sourceCard = source.getCard();
         CommandCard targetCard = target.getCard();
@@ -398,8 +537,9 @@ public class GameController {
         }
     }
 
-
-
+    /**
+     * A custom exception to indicate that a move is not possible.
+     */
     class ImpossibleMoveException extends Exception {
 
         private Player player;

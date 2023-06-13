@@ -22,21 +22,30 @@
 package dk.dtu.compute.se.pisd.roborally.model;
 
 /**
- * ...
- *
- * @author Ekkart Kindler, ekki@dtu.dk
- *
+ * Enum representing the possible headings in the game, namely North, East, South, and West.
  */
 public enum Heading {
 
     SOUTH, WEST, NORTH, EAST;
-
+    /**
+     * Returns the opposite heading of the current heading.
+     *
+     * @return Heading which is opposite to the current heading.
+     */
     public Heading opposing() { return values()[(this.ordinal()+2) % values().length]; }
-
+    /**
+     * Returns next heading in clockwise order.
+     *
+     * @return Next heading.
+     */
     public Heading next() {
         return values()[(this.ordinal() + 1) % values().length];
     }
-
+    /**
+     * Returns previous heading in counterclockwise order.
+     *
+     * @return Previous heading.
+     */
     public Heading prev() {
         return values()[(this.ordinal() + values().length - 1) % values().length];
     }
