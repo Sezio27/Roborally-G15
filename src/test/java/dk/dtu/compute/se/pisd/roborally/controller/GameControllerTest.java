@@ -22,8 +22,12 @@ class GameControllerTest {
         for (int i = 0; i < NUMBER_OF_PLAYERS; i++) {
             Player player = new Player(board, null, "Player " + (i + 1));
             board.addPlayer(player);
+            Space spawnSpace = board.getSpace(0,i);
+            board.addSpawnSpace(spawnSpace);
+            player.setSpace(spawnSpace);
+            player.setSpawnSpace(spawnSpace);
         }
-        gameController.initializeGame(6);
+
     }
 
     @AfterEach
@@ -36,8 +40,8 @@ class GameControllerTest {
         Board board = gameController.board;
         Player player1 = board.getPlayer(0);
         Player player2 = board.getPlayer(1);
-        Space startSpace1 = board.getStartSpaces()[0];
-        Space startSpace2 = board.getStartSpaces()[1];
+        Space startSpace1 = board.getSpawnSpaces().get(0);
+        Space startSpace2 = board.getSpawnSpaces().get(1);
 
         Assertions.assertEquals(player1.getSpace(), startSpace1);
         Assertions.assertEquals(player2.getSpace(), startSpace2);

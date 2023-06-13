@@ -23,11 +23,9 @@ package dk.dtu.compute.se.pisd.roborally.model;
 
 import com.google.gson.annotations.Expose;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
-import dk.dtu.compute.se.pisd.roborally.view.SpaceView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 import static dk.dtu.compute.se.pisd.roborally.model.Phase.INITIALISATION;
 
@@ -61,8 +59,8 @@ public class Board extends Subject {
     private boolean stepMode;
 
     private int numberOfCheckpoints;
-
-    private Space[] startSpaces;
+    @Expose
+    private List<Space> spawnSpaces = new ArrayList<>();
 
     private Space deadSpace;
 
@@ -92,15 +90,16 @@ public class Board extends Subject {
         this(width, height, "defaultboard");
     }
 
-    public void setStartSpacesDefault(int maxPlayer) {
-        startSpaces = new Space[maxPlayer];
+
+
+    public void setSpawnSpacesDefault(int maxPlayer) {
         for (int i = 0; i < maxPlayer; i++) {
-            startSpaces[i] = spaces[0][i];
+            spawnSpaces.add(spaces[0][i]);
         }
     }
 
-    public Space[] getStartSpaces() {
-        return startSpaces;
+    public List<Space> getSpawnSpaces() {
+        return spawnSpaces;
     }
 
     // To be deleted
@@ -273,5 +272,9 @@ public class Board extends Subject {
 
     public String getMap() {
         return map;
+    }
+
+    public void addSpawnSpace(Space space) {
+        spawnSpaces.add(space);
     }
 }

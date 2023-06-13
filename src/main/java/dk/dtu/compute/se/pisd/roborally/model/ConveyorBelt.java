@@ -65,7 +65,7 @@ public class ConveyorBelt extends FieldAction {
             boolean notOccupied = target.getPlayer() == null;
             return notOccupied && reachable;
         }
-
-        return false;
+        //Meaning it has moved the player outside board
+        return true;
     }
 }

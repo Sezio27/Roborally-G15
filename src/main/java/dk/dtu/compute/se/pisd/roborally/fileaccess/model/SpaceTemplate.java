@@ -44,4 +44,14 @@ public class SpaceTemplate {
     public int x;
     public int y;
 
+    public int startNumber;
+
+    public SpaceTemplate(int x, int y, List<Heading> walls, FieldAction action) {
+        this.x = x;
+        this.y = y;
+        this.walls = walls;
+        this.action = action;
+
+    }
+
 }

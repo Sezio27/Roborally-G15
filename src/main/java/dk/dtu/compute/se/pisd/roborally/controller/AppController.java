@@ -17,6 +17,8 @@ import java.util.Optional;
 public class AppController implements Observer {
 
     final private List<Integer> PLAYER_NUMBER_OPTIONS = Arrays.asList(2, 3, 4, 5, 6);
+
+    final private int MAX_PLAYERS = 6;
     final private List<String> PLAYER_COLORS = Arrays.asList("red", "green", "blue", "orange", "grey", "magenta");
 
     final private RoboRally roboRally;
@@ -37,54 +39,60 @@ public class AppController implements Observer {
             }
         }
 
-        int playerCount = 0;
-        while (playerCount < 1) playerCount = selectPlayerCount();
+        int playerCount = selectPlayerCount();
+
+        if (playerCount < 2 || playerCount > 6) {
+            showAlert("Please select between 2 - 6 players");
+            return;
+        }
+        ;
 
         String[] boards = LoadBoard.getTracks();
-
-        if (boards.length < 1) {
-            createAndStartDefault(playerCount);
+        Board board;
+        if (boards.length < 1 || Arrays.stream(boards).noneMatch(s -> s.equals("defaultboard"))) {
+            board = createAndSaveDefault();
         } else {
-            Board board = LoadBoard.loadBoard(selectBoard(boards));
-
-            gameController = new GameController(board);
-
-            createPlayers(board,playerCount);
-            gameController.initializeGame(playerCount);
-            gameController.startProgrammingPhase();
-
-            roboRally.createBoardView(gameController);
+            board = LoadBoard.loadBoard(selectBoard(boards));
         }
-    }
-
-    private void createAndStartDefault(int playerCount) {
-        Board board = new Board(8, 8);
-        gameController = new GameController(board);
-
-        createPlayers(board, playerCount);
-
-        gameController.initializeGame(playerCount);
-
-        //Remember based on saved state can be other starting phase..
-        gameController.startProgrammingPhase();
-
-        roboRally.createBoardView(gameController);
-    }
-
-    private void createPlayers(Board board, int playerCount) {
-
-        if (!board.getPlayers().isEmpty()) return;
 
         for (int i = 0; i < playerCount; i++) {
             Player player = new Player(board, PLAYER_COLORS.get(i), "Player " + (i + 1));
+            Space spawnSpace = board.getSpawnSpaces().get(i);
+            player.setSpawnSpace(spawnSpace);
+            player.setSpace(spawnSpace);
             board.addPlayer(player);
-
         }
+
+        gameController = new GameController(board);
+        gameController.startProgrammingPhase();
+        roboRally.createBoardView(gameController);
+
+    }
+
+    private Board createAndSaveDefault() {
+        //Temp hack/solution
+        String boardName = "defaultboard";
+        selectBoard(new String[]{boardName});
+
+        Board board = new Board(8, 8);
+        board.setSpawnSpacesDefault(MAX_PLAYERS);
+
+        board.getSpace(3, 3).addWall(Heading.WEST);
+        board.getSpace(3, 4).addWall(Heading.WEST);
+        board.getSpace(3, 6).addWall(Heading.WEST);
+        board.getSpace(3, 5).setAction(new ConveyorBelt(Heading.WEST));
+        board.getSpace(0, 0).setAction(new ConveyorBelt(Heading.WEST));
+        board.getSpace(2, 5).setAction(new ConveyorBelt(Heading.WEST));
+        board.getSpace(4, 6).setAction(new Checkpoint(1));
+        board.getSpace(1, 5).setAction(new Checkpoint(2));
+
+
+        LoadBoard.saveBoard(board, boardName);
+        return board;
 
     }
 
     private String selectBoard(String[] boards) {
-
 
         if (boards == null) {
             showAlert("No tracks");
@@ -121,14 +129,14 @@ public class AppController implements Observer {
         alert.showAndWait();
     }
 
-    public void saveGame(){
+    public void saveGame() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Save game");
         dialog.setHeaderText("save as");
 
         String result = dialog.showAndWait().get();
 
-        if (result.equals("") ) {
+        if (result.equals("")) {
             showAlert("Please enter a name for the saved game");
             return;
         }
@@ -146,16 +154,22 @@ public class AppController implements Observer {
 
         String track = selectBoard(LoadBoard.getActiveGames());
 
-        if (track == null || track.equals("")) return;
-        System.out.println((track));
+        if (track == null || track.isEmpty()) {
+            showAlert("Could not load game");
+            return;
+        }
+
         Board board = LoadBoard.loadActiveBoard(track);
+        if (board == null) {
+            showAlert("Could not load game");
+            return;
+        }
+
         gameController = new GameController(board);
-
         roboRally.createBoardView(gameController);
-    }
-  {
 
     }
+
 
     /**
      * Stop playing the current game, giving the user the option to save
@@ -208,13 +222,5 @@ public class AppController implements Observer {
         // XXX do nothing for now
     }
 
-
-    class InputException extends Exception {
-        public InputException(String message) {
-            super(message);
-
-        }
-
-    }
 
 }

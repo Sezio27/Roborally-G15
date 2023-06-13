@@ -32,7 +32,6 @@ import static dk.dtu.compute.se.pisd.roborally.model.Heading.SOUTH;
  * ...
  *
  * @author Ekkart Kindler, ekki@dtu.dk
- *
  */
 public class Player extends Subject {
 
@@ -85,6 +84,8 @@ public class Player extends Subject {
         return name;
     }
 
+    public void setCurrentCheckpoint(int n) {currentCheckpoint = n;}
+
     public void setSpawnSpace(Space spawnSpace) {
         this.spawnSpace = spawnSpace;
     }
@@ -117,6 +118,19 @@ public class Player extends Subject {
 
     public Space getSpace() {
         return space;
+    }
+
+    public void respawn() {
+        if (spawnSpace == null || spawnSpace.getPlayer() != null) {
+            System.out.println("Error spawning"); //exception..
+            return;
+        }
+        Space oldSpace = this.space;
+        oldSpace.setPlayer(null);
+        space = spawnSpace;
+        space.setPlayer(this);
+        notifyChange();
+
     }
 
     public void setSpace(Space space) {
@@ -152,12 +166,15 @@ public class Player extends Subject {
         this.rebooting = rebooting;
     }
 
-    public boolean isRebooting() { return rebooting; }
+    public boolean isRebooting() {
+        return rebooting;
+    }
 
     public CommandCardField getProgramField(int i) {
         return program[i];
     }
-    public void setProgramField(int i, CommandCardField field){
+
+    public void setProgramField(int i, CommandCardField field) {
         program[i].setCard(field.getCard());
         program[i].setVisible(field.isVisible());
         notifyChange();
@@ -167,13 +184,19 @@ public class Player extends Subject {
         return cards[i];
 
     }
-    public void setCardField(int i, CommandCardField field){
+
+    public void setCardField(int i, CommandCardField field) {
         cards[i].setCard(field.getCard());
         notifyChange();
     }
 
 
-    public int getCurrentCheckpoint() { return currentCheckpoint; }
-    public void updateCheckpoint() { currentCheckpoint++;}
+    public int getCurrentCheckpoint() {
+        return currentCheckpoint;
+    }
+
+    public void updateCheckpoint() {
+        currentCheckpoint++;
+    }
 
 }
