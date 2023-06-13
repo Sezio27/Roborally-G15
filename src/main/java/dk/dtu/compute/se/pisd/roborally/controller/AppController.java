@@ -49,22 +49,15 @@ public class AppController implements Observer {
 
         String[] boards = LoadBoard.getTracks();
         Board board;
-        if (boards.length < 1 || Arrays.stream(boards).noneMatch(s -> s.equals("defaultboard"))) {
+        if (boards == null || boards.length < 1 || Arrays.stream(boards).noneMatch(s -> s.equals("defaultboard"))) {
             board = createAndSaveDefault();
         } else {
             board = LoadBoard.loadBoard(selectBoard(boards));
         }
 
-        for (int i = 0; i < playerCount; i++) {
-            Player player = new Player(board, PLAYER_COLORS.get(i), "Player " + (i + 1));
-            Space spawnSpace = board.getSpawnSpaces().get(i);
-            player.setSpawnSpace(spawnSpace);
-            player.setSpace(spawnSpace);
-            board.addPlayer(player);
-        }
-
         gameController = new GameController(board);
-        gameController.startProgrammingPhase();
+        gameController.initialize(playerCount, PLAYER_COLORS);
+
         roboRally.createBoardView(gameController);
 
     }
@@ -83,6 +76,7 @@ public class AppController implements Observer {
         board.getSpace(3, 5).setAction(new ConveyorBelt(Heading.WEST));
         board.getSpace(0, 0).setAction(new ConveyorBelt(Heading.WEST));
         board.getSpace(2, 5).setAction(new ConveyorBelt(Heading.WEST));
+        board.getSpace(6, 3).setAction(new ConveyorBelt(Heading.NORTH));
         board.getSpace(4, 6).setAction(new Checkpoint(1));
         board.getSpace(1, 5).setAction(new Checkpoint(2));
 

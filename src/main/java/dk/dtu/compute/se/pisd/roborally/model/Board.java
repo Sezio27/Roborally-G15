@@ -102,11 +102,6 @@ public class Board extends Subject {
         return spawnSpaces;
     }
 
-    // To be deleted
-    private void putCheckPoint(Space space) {
-        numberOfCheckpoints++;
-        space.setAction(new Checkpoint(numberOfCheckpoints));
-    }
     public void setNumberOfCheckpoints(int i){
         numberOfCheckpoints = i;
     }
@@ -253,18 +248,13 @@ public class Board extends Subject {
     }
 
     public String getStatusMessage() {
-        // this is actually a view aspect, but for making assignment V1 easy for
-        // the students, this method gives a string representation of the current
-        // status of the game
 
-        // XXX: V2 changed the status so that it shows the phase, the player and the step
         return  "Map: " + boardName +
                 ", phase: " + getPhase().name() +
                 ", Player = " + getCurrentPlayer().getName() +
                 ", Step: " + getStep() +
                 ", current checkpoint: " + getCurrentPlayer().getCurrentCheckpoint();
     }
-
 
     public void setMap(String m) {
         map = m;

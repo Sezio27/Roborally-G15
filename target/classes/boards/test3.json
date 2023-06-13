@@ -85,18 +85,6 @@
       "x": 4,
       "y": 6,
       "startNumber": 0
-    },
-    {
-      "walls": [],
-      "action": {
-        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
-        "INSTANCE": {
-          "heading": "NORTH"
-        }
-      },
-      "x": 6,
-      "y": 3,
-      "startNumber": 0
     }
   ],
   "spawnSpaces": [

@@ -40,11 +40,12 @@ import java.util.Map;
  */
 public class LoadBoard {
 
-    private static final String BOARDSFOLDER = "boards";
-    private static final String DEFAULTBOARD = "defaultboard";
-    private static final String ACTIVEGAMES = "activeGames";
-    private static final String JSON_EXT = "json";
 
+    private static final String DEFAULTBOARD = "defaultboard";
+    private static final String JSON_EXT = "json";
+    private static final String PATH_TO_RES = "src" + File.separator + "main" + File.separator + "resources" + File.separator;
+    private static final String BOARDSFOLDER = PATH_TO_RES + "boards";
+    private static final String ACTIVEGAMES = PATH_TO_RES + "activeGames";
 
     public static Board loadBoard(String boardName) {
 
@@ -53,11 +54,11 @@ public class LoadBoard {
             System.out.println("printing default");
         }
 
-        File file = new File("src\\main\\resources\\"+BOARDSFOLDER + "\\" + boardName + "." + JSON_EXT);
+        File file = new File(BOARDSFOLDER + File.separator + boardName + "." + JSON_EXT);
 
         if (!file.exists()) {
             System.out.println("File not found - printing default");
-            file = new File("src\\main\\resources\\"+BOARDSFOLDER + "\\" + DEFAULTBOARD + "." + JSON_EXT);
+            file = new File(BOARDSFOLDER + File.separator + DEFAULTBOARD + "." + JSON_EXT);
         }
 
         GsonBuilder simpleBuilder = new GsonBuilder().registerTypeAdapter(FieldAction.class, new Adapter<FieldAction>());
@@ -78,18 +79,20 @@ public class LoadBoard {
                     result.addSpawnSpace(space);
                 }
             }
-
+            int checkPoints = 0;
             for (SpaceTemplate spaceTemplate: template.spaces) {
                 Space space = result.getSpace(spaceTemplate.x, spaceTemplate.y);
                 if (space != null) {
+                    if (spaceTemplate.action instanceof Checkpoint) checkPoints++;
                     space.setAction(spaceTemplate.action);
                     space.getWalls().addAll(spaceTemplate.walls);
                 }
             }
 
             reader.close();
-            result.setNumberOfCheckpoints(template.numberOfCheckPoints);
+            result.setNumberOfCheckpoints(checkPoints);
             result.setMap(boardName);
+
             return result;
         } catch (IOException e1) {
             if (reader != null) {
@@ -104,7 +107,7 @@ public class LoadBoard {
 
 
     public static Board loadActiveBoard(String activeGameName){
-        File file = new File("src\\main\\resources\\"+ ACTIVEGAMES + "\\" + activeGameName + "." + JSON_EXT);
+        File file = new File(ACTIVEGAMES + File.separator + activeGameName + "." + JSON_EXT);
 
         if (!file.exists()) {
             return null;
@@ -181,7 +184,7 @@ public class LoadBoard {
 
     public static String[] getTracks(){
 
-        File folder = new File("src\\main\\resources\\"+BOARDSFOLDER);
+        File folder = new File(BOARDSFOLDER);
         System.out.println(folder.getAbsolutePath());
 
         if(folder.listFiles() == null)
@@ -192,7 +195,7 @@ public class LoadBoard {
         return files;
     }
     public static String[] getActiveGames(){
-        File folder = new File("src\\main\\resources\\"+ACTIVEGAMES);
+        File folder = new File(ACTIVEGAMES);
 
         if(folder.listFiles() == null)
             return null;
@@ -209,8 +212,6 @@ public class LoadBoard {
         template.width = board.width;
         template.height = board.height;
 
-        template.numberOfCheckPoints = board.getNumberOfCheckpoints();
-
         for (Space space : board.getSpawnSpaces()) {
             SpaceTemplate spaceTemplate = new SpaceTemplate(space.x, space.y, space.getWalls(), space.getAction());
             template.spawnSpaces.add(spaceTemplate);
@@ -226,7 +227,7 @@ public class LoadBoard {
             }
         }
 
-        String filename = "src\\main\\resources\\" + BOARDSFOLDER + "\\" + name + "." + JSON_EXT;
+        String filename = BOARDSFOLDER + File.separator + name + "." + JSON_EXT;
 
         GsonBuilder simpleBuilder = new GsonBuilder().
                 registerTypeAdapter(FieldAction.class, new Adapter<FieldAction>()).
@@ -263,8 +264,7 @@ public class LoadBoard {
         Gson gson = simpleBuilder.create();
 
 
-        String filename =
-                "src\\main\\resources\\" + ACTIVEGAMES + "\\" + name + "." + JSON_EXT;
+        String filename = ACTIVEGAMES + File.separator + name + "." + JSON_EXT;
         FileWriter fileWriter = null;
         JsonWriter writer = null;
 

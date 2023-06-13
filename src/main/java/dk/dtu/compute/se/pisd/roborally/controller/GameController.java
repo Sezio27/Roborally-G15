@@ -44,7 +44,18 @@ public class GameController {
         this.board = board;
     }
 
+    public void initialize(int playerCount, List<String> colors) {
+        if (board.getSpawnSpaces().isEmpty()) board.setSpawnSpacesDefault(playerCount);
 
+        for (int i = 0; i < playerCount; i++) {
+            Player player = new Player(board, colors.get(i), "Player " + (i + 1));
+            Space spawnSpace = board.getSpawnSpaces().get(i);
+            player.setSpawnSpace(spawnSpace);
+            player.setSpace(spawnSpace);
+            board.addPlayer(player);
+        }
+        startProgrammingPhase();
+    }
     public void moveCurrentPlayerToSpace(@NotNull Space space) {
 
         if (space != null && space.board == board) {
@@ -59,14 +70,13 @@ public class GameController {
     }
 
     public void updateCheckpoint(@NotNull Player player, Space space, int number) {
+        player.updateCheckpoint();
+        System.out.println(player.getName() + " - new checkpoint: " + number);
 
-        System.out.println(player.getName() + " - new checkpoint: " + player.getCurrentCheckpoint());
         if (board.getNumberOfCheckpoints() == number) {
             handleWin(player);
         }
-        player.updateCheckpoint();
         player.setSpawnSpace(space);
-
     }
 
     public void handleWin(@NotNull Player player) {
@@ -81,10 +91,8 @@ public class GameController {
         for (int i = 0; i < board.getPlayersNumber(); i++) {
             Player player = board.getPlayer(i);
             if (player.isRebooting()) {
-
                 player.setRebooting(false);
                 player.respawn();
-
             }
             if (player != null) {
                 for (int j = 0; j < Player.NO_REGISTERS; j++) {
@@ -142,9 +150,6 @@ public class GameController {
 
     public void executeStep() {
         board.setStepMode(true);
-        System.out.println(board.getCurrentPlayer().getName());
-        System.out.println(board.getCurrentPlayer().getSpace().x + " , " + board.getCurrentPlayer().getSpace().y);
-        System.out.println(board.getCurrentPlayer().getSpawnSpace().x + ", " + board.getCurrentPlayer().getSpawnSpace().y );
         continuePrograms();
     }
 
@@ -173,7 +178,7 @@ public class GameController {
             }
         }
 
-        if (destinationMap.size() > 1) {
+
             //Only move players with unique destinations
             destinationMap.entrySet().stream()
                     .filter(entry -> entry.getValue().size() == 1)
@@ -182,9 +187,6 @@ public class GameController {
                         Space destination = entry.getKey();
                         player.setSpace(destination);
                     });
-        }
-
-
     }
 
 
@@ -198,7 +200,6 @@ public class GameController {
             if (space != null) {
                 FieldAction action = space.getAction();
                 if (action != null) {
-
 
                     //Special case for conveyors, must be handled separately
                     if (action instanceof ConveyorBelt) {
@@ -235,7 +236,6 @@ public class GameController {
                 }
 
                 finishCommand();
-
 
             } else {
                 // this should not happen
@@ -332,11 +332,6 @@ public class GameController {
         if (other != null) {
 
             Space otherDestination = board.getNeighbour(destination, heading);
-            if (otherDestination == board.getDeadSpace()) {
-                handleReboot(other);
-                player.setSpace(destination);
-                return;
-            }
 
             if (moveCount <= board.getPlayersNumber() && !otherDestination.getWalls().contains(heading.opposing())) {
 
