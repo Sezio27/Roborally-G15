@@ -23,7 +23,7 @@ package dk.dtu.compute.se.pisd.roborally.model;
 
 /**
  * ...
- *
+ * Enum representing the possible phases of the game.
  * @author Ekkart Kindler, ekki@dtu.dk
  *
  */

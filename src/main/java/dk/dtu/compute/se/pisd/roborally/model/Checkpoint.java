@@ -25,14 +25,18 @@ import dk.dtu.compute.se.pisd.roborally.controller.GameController;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * ...
+ * Class representing a Checkpoint action on a game field.
  *
- * @author Ekkart Kindler, ekki@dtu.dk
+ * @author @author Jakob Jacobsen, s204502
  */
 public class Checkpoint extends FieldAction {
 
     private final int number;
-
+    /**
+     * Constructs a Checkpoint action with a specified number.
+     *
+     * @param number the number of this Checkpoint
+     */
     public Checkpoint(int number) {
         this.number = number;
     }
@@ -41,7 +45,14 @@ public class Checkpoint extends FieldAction {
         return number;
     }
 
-
+    /**
+     * Executes the Checkpoint action on a given Space in a specified GameController.
+     * Updates the player's current checkpoint if it's the next one in order.
+     *
+     * @param gameController the GameController to execute the action in
+     * @param space the Space to execute the action on
+     * @return true if the action is successfully executed, false otherwise
+     */
     @Override
     public boolean doAction(@NotNull GameController gameController, @NotNull Space space) {
         Player player = space.getPlayer();

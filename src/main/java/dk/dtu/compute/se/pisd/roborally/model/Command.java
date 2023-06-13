@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * ...
+ * Enum representing the different commands that can be issued in the game.
  *
  * @author Ekkart Kindler, ekki@dtu.dk
  *
@@ -48,24 +48,30 @@ public enum Command {
     @Expose
     final public String displayName;
 
-    // XXX Assignment P3
-    // Command(String displayName) {
-    //     this.displayName = displayName;
-    // }
-    //
-    // replaced by the code below:
-
     final private List<Command> options;
-
+    /**
+     * Constructs a Command with a displayName and a list of options.
+     *
+     * @param displayName name of the command for display purposes
+     * @param options optional commands to be used interactively
+     */
     Command(String displayName, Command... options) {
         this.displayName = displayName;
         this.options = Collections.unmodifiableList(Arrays.asList(options));
     }
-
+    /**
+     * Returns whether the command is interactive.
+     *
+     * @return boolean indicating if the command is interactive
+     */
     public boolean isInteractive() {
         return !options.isEmpty();
     }
-
+    /**
+     * Returns the list of options for this command.
+     *
+     * @return list of command options
+     */
     public List<Command> getOptions() {
         return options;
     }

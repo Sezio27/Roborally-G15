@@ -28,9 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ...
+ * Represents a specific space on the board. Each space may contain a player,
+ *  and could have walls or an associated field action. A space is aware of its position on the board
+ *  and can inform players or actions of any changes in its state.
  *
- * @author Ekkart Kindler, ekki@dtu.dk
+ * @author Jakob Jacobsen, s204502
  *
  */
 public class Space extends Subject {
@@ -51,18 +53,34 @@ public class Space extends Subject {
 
     private Player player;
 
-
+    /**
+     * Constructs a new space on the specified board at the given coordinates.
+     *
+     * @param board the board on which this space is located
+     * @param x the x-coordinate of this space on the board
+     * @param y the y-coordinate of this space on the board
+     */
     public Space(Board board, int x, int y) {
         this.board = board;
         this.x = x;
         this.y = y;
         player = null;
     }
-
+    /**
+     * Returns the player that is currently on this space.
+     *
+     * @return the player on this space, or null if there is no player
+     */
     public Player getPlayer() {
         return player;
     }
-
+    /**
+     * Sets the player for this space.
+     * If the player is null or from the same board, the player is set,
+     * the space for the player is updated and observers are notified of the change.
+     *
+     * @param player the player to set for this space
+     */
     public void setPlayer(Player player) {
 
         Player oldPlayer = this.player;
@@ -79,14 +97,24 @@ public class Space extends Subject {
     public List<Heading> getWalls() {
         return walls;
     }
-
+    /**
+     * Adds a wall in the specified heading on this space.
+     * If a wall already exists in that direction, this method does nothing.
+     *
+     * @param heading the direction in which to place the wall
+     */
     public void addWall(Heading heading) {
         if ( ! walls.contains(heading)) {
             walls.add(heading);
             notifyChange();
         }
     }
-
+    /**
+     * Sets the field action for this space.
+     * This is the action that will be performed on this space at the end of a register round.
+     *
+     * @param action the field action to set for this space
+     */
     public void setAction(FieldAction action) {
         this.action = action;
     }
@@ -94,7 +122,13 @@ public class Space extends Subject {
     public FieldAction getAction() {
         return action;
     }
-
+    /**
+     * Returns the action of the specified type that is associated with this space.
+     * If the action is not of the specified type, this method returns null.
+     *
+     * @param type the Class object corresponding to the type of action to return
+     * @return the action of the specified type, or null if there is no such action
+     */
     public <T extends FieldAction> T getActionType(Class<T> type) {
         if (type.isInstance(action)) {
             return type.cast(action);

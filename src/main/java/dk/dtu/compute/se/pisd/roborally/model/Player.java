@@ -29,9 +29,9 @@ import org.jetbrains.annotations.NotNull;
 import static dk.dtu.compute.se.pisd.roborally.model.Heading.SOUTH;
 
 /**
- * ...
+ * Represents a player in the game. The player's movements and actions are driven by CommandCard objects and FieldActions.
  *
- * @author Ekkart Kindler, ekki@dtu.dk
+ * @author Jakob Jacobsen, s204502
  */
 public class Player extends Subject {
 
@@ -58,7 +58,13 @@ public class Player extends Subject {
     private Space spawnSpace;
     @Expose
     private boolean rebooting;
-
+    /**
+     * Constructs a new Player.
+     *
+     * @param board the board this player is playing on
+     * @param color the color assigned to this player
+     * @param name  the name of this player
+     */
     public Player(@NotNull Board board, String color, @NotNull String name) {
         this.board = board;
         this.name = name;
@@ -89,7 +95,10 @@ public class Player extends Subject {
     public void setSpawnSpace(Space spawnSpace) {
         this.spawnSpace = spawnSpace;
     }
-
+    /**
+     * Returns the player's current spawn location.
+     * @return a Space object representing the player's spawn location
+     */
     public Space getSpawnSpace() {
         return spawnSpace;
     }
@@ -119,7 +128,10 @@ public class Player extends Subject {
     public Space getSpace() {
         return space;
     }
-
+    /**
+     * Respawns the player at their spawn location if it is unoccupied.
+     *
+     */
     public void respawn() {
         if (spawnSpace == null || spawnSpace.getPlayer() != null) {
             System.out.println("Error spawning"); //exception..
@@ -132,7 +144,14 @@ public class Player extends Subject {
         notifyChange();
 
     }
-
+    /**
+     * Sets the space for this player and updates the player reference in the old and new space accordingly.
+     *
+     * It also ensures that the old space no longer references this player,
+     * and the new space now references this player.
+     *
+     * @param space the new space to be set for this player
+     */
     public void setSpace(Space space) {
         Space oldSpace = this.space;
         if (space != oldSpace &&
@@ -151,7 +170,10 @@ public class Player extends Subject {
     public Heading getHeading() {
         return heading;
     }
-
+    /**
+     * Sets the current heading (direction) of the player.
+     * @param heading the new heading of the player
+     */
     public void setHeading(@NotNull Heading heading) {
         if (heading != this.heading) {
             this.heading = heading;
@@ -165,7 +187,11 @@ public class Player extends Subject {
     public void setRebooting(boolean rebooting) {
         this.rebooting = rebooting;
     }
-
+    /**
+     * Returns whether the player is currently rebooting or not.
+     * A rebooting player is temporarily inactive and will become active again after the last register round.
+     * @return true if the player is rebooting, false otherwise
+     */
     public boolean isRebooting() {
         return rebooting;
     }
@@ -173,7 +199,12 @@ public class Player extends Subject {
     public CommandCardField getProgramField(int i) {
         return program[i];
     }
-
+    /**
+     * Assigns a CommandCardField to a specific register in the player's program.
+     * This represents a command card slot in the player's program area.
+     * @param i the index of the register to assign the command card field to
+     * @param field the CommandCardField to be assigned
+     */
     public void setProgramField(int i, CommandCardField field) {
         program[i].setCard(field.getCard());
         program[i].setVisible(field.isVisible());

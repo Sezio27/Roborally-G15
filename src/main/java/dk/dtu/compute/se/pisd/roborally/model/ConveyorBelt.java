@@ -28,16 +28,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ...
+ * Class representing a ConveyorBelt action on a game field.
  *
- * @author Ekkart Kindler, ekki@dtu.dk
+ * @author Jakob Jacobsen, s204502
  *
  */
 public class ConveyorBelt extends FieldAction {
     private Heading heading;
 
     private Space target;
-
+    /**
+     * Constructs a ConveyorBelt action with a specified heading.
+     *
+     * @param heading the heading of this ConveyorBelt action
+     */
     public ConveyorBelt(Heading heading) {
         this.heading = heading;
     }
@@ -49,11 +53,22 @@ public class ConveyorBelt extends FieldAction {
     public void setHeading(Heading heading) {
         this.heading = heading;
     }
-
+    /**
+     * Returns the target Space of this ConveyorBelt action.
+     *
+     * @return the target Space
+     */
     public Space getTarget() {
         return target;
     };
-
+    /**
+     * Executes the ConveyorBelt action on a given Space in a specified GameController.
+     * Moves the player to the target space if it is reachable and not occupied.
+     *
+     * @param gameController the GameController to execute the action in
+     * @param space the Space to execute the action on
+     * @return true if the action is successfully executed, false otherwise
+     */
     @Override
     public boolean doAction(@NotNull GameController gameController, @NotNull Space space) {
 
@@ -64,7 +79,6 @@ public class ConveyorBelt extends FieldAction {
             boolean notOccupied = target.getPlayer() == null;
             return notOccupied && reachable;
         }
-
         //Meaning it has moved the player outside board
         return true;
     }
