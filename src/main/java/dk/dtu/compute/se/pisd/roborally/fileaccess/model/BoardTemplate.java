@@ -22,7 +22,9 @@
 package dk.dtu.compute.se.pisd.roborally.fileaccess.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -37,5 +39,9 @@ public class BoardTemplate {
     public int height;
 
     public List<SpaceTemplate> spaces = new ArrayList<>();
+
+    public List<SpaceTemplate> spawnSpaces = new ArrayList<>();
+
+    public int numberOfCheckPoints;
 
 }

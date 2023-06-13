@@ -1,0 +1,135 @@
+{
+  "width": 8,
+  "height": 8,
+  "spaces": [
+    {
+      "walls": [],
+      "action": {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
+        "INSTANCE": {
+          "heading": "WEST"
+        }
+      },
+      "x": 0,
+      "y": 0,
+      "startNumber": 0
+    },
+    {
+      "walls": [],
+      "action": {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.Checkpoint",
+        "INSTANCE": {
+          "number": 2
+        }
+      },
+      "x": 1,
+      "y": 5,
+      "startNumber": 0
+    },
+    {
+      "walls": [],
+      "action": {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
+        "INSTANCE": {
+          "heading": "WEST"
+        }
+      },
+      "x": 2,
+      "y": 5,
+      "startNumber": 0
+    },
+    {
+      "walls": [
+        "WEST"
+      ],
+      "x": 3,
+      "y": 3,
+      "startNumber": 0
+    },
+    {
+      "walls": [
+        "WEST"
+      ],
+      "x": 3,
+      "y": 4,
+      "startNumber": 0
+    },
+    {
+      "walls": [],
+      "action": {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
+        "INSTANCE": {
+          "heading": "WEST"
+        }
+      },
+      "x": 3,
+      "y": 5,
+      "startNumber": 0
+    },
+    {
+      "walls": [
+        "WEST"
+      ],
+      "x": 3,
+      "y": 6,
+      "startNumber": 0
+    },
+    {
+      "walls": [],
+      "action": {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.Checkpoint",
+        "INSTANCE": {
+          "number": 1
+        }
+      },
+      "x": 4,
+      "y": 6,
+      "startNumber": 0
+    }
+  ],
+  "spawnSpaces": [
+    {
+      "walls": [],
+      "action": {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.ConveyorBelt",
+        "INSTANCE": {
+          "heading": "WEST"
+        }
+      },
+      "x": 0,
+      "y": 0,
+      "startNumber": 0
+    },
+    {
+      "walls": [],
+      "x": 0,
+      "y": 1,
+      "startNumber": 0
+    },
+    {
+      "walls": [],
+      "x": 0,
+      "y": 2,
+      "startNumber": 0
+    },
+    {
+      "walls": [],
+      "x": 0,
+      "y": 3,
+      "startNumber": 0
+    },
+    {
+      "walls": [],
+      "x": 0,
+      "y": 4,
+      "startNumber": 0
+    },
+    {
+      "walls": [],
+      "x": 0,
+      "y": 5,
+      "startNumber": 0
+    }
+  ],
+  "numberOfCheckPoints": 0
+}

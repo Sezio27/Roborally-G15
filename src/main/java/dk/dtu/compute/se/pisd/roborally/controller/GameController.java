@@ -24,7 +24,9 @@ package dk.dtu.compute.se.pisd.roborally.controller;
 import dk.dtu.compute.se.pisd.roborally.model.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -42,17 +44,18 @@ public class GameController {
         this.board = board;
     }
 
-    public void initializeGame(int maxPlayers) {
-        board.setStartSpacesDefault(maxPlayers);
-        for (int i = 0; i < maxPlayers; i++) {
-            Player player = board.getPlayer(i);
-            Space startSpace = board.getStartSpaces()[i];
-            player.setSpace(startSpace);
-            player.setSpawnSpace(startSpace);
+    public void initialize(int playerCount, List<String> colors) {
+        if (board.getSpawnSpaces().isEmpty()) board.setSpawnSpacesDefault(playerCount);
+
+        for (int i = 0; i < playerCount; i++) {
+            Player player = new Player(board, colors.get(i), "Player " + (i + 1));
+            Space spawnSpace = board.getSpawnSpaces().get(i);
+            player.setSpawnSpace(spawnSpace);
+            player.setSpace(spawnSpace);
+            board.addPlayer(player);
         }
-
+        startProgrammingPhase();
     }
-
     public void moveCurrentPlayerToSpace(@NotNull Space space) {
 
         if (space != null && space.board == board) {
@@ -67,14 +70,13 @@ public class GameController {
     }
 
     public void updateCheckpoint(@NotNull Player player, Space space, int number) {
+        player.updateCheckpoint();
+        System.out.println(player.getName() + " - new checkpoint: " + number);
 
-        System.out.println(player.getName() + " - new checkpoint: " + player.getCurrentCheckpoint());
         if (board.getNumberOfCheckpoints() == number) {
             handleWin(player);
         }
-        player.updateCheckpoint();
         player.setSpawnSpace(space);
-
     }
 
     public void handleWin(@NotNull Player player) {
@@ -89,8 +91,8 @@ public class GameController {
         for (int i = 0; i < board.getPlayersNumber(); i++) {
             Player player = board.getPlayer(i);
             if (player.isRebooting()) {
-                player.setSpace(player.getSpawnSpace());
                 player.setRebooting(false);
+                player.respawn();
             }
             if (player != null) {
                 for (int j = 0; j < Player.NO_REGISTERS; j++) {
@@ -169,19 +171,23 @@ public class GameController {
 
             if (belt.doAction(this, source)) {
                 Space destination = belt.getTarget();
-                destinationMap.computeIfAbsent(destination, k -> new ArrayList<>()).add(player);
+                if (destination == null || destination == board.getDeadSpace()) {
+                    handleReboot(player);
+                } else {
+                    destinationMap.computeIfAbsent(destination, k -> new ArrayList<>()).add(player);
+                }
             }
         }
 
-        //Only move players with unique destinations
-        destinationMap.entrySet().stream()
-                .filter(entry -> entry.getValue().size() == 1)
-                .forEach(entry -> {
-                    Player player = entry.getValue().get(0);
-                    Space destination = entry.getKey();
-                    player.setSpace(destination);
-                });
 
+            //Only move players with unique destinations
+            destinationMap.entrySet().stream()
+                    .filter(entry -> entry.getValue().size() == 1)
+                    .forEach(entry -> {
+                        Player player = entry.getValue().get(0);
+                        Space destination = entry.getKey();
+                        player.setSpace(destination);
+                    });
     }
 
 
@@ -191,10 +197,10 @@ public class GameController {
 
         for (Player player : board.getPlayers()) {
             Space space = player.getSpace();
+
             if (space != null) {
                 FieldAction action = space.getAction();
                 if (action != null) {
-
 
                     //Special case for conveyors, must be handled separately
                     if (action instanceof ConveyorBelt) {
@@ -205,13 +211,17 @@ public class GameController {
             }
 
         }
-
         if (!playersOnConveyors.isEmpty()) handleConveyorMove(playersOnConveyors);
     }
 
     private void executeNextStep() {
 
         Player currentPlayer = board.getCurrentPlayer();
+        if (currentPlayer.isRebooting()) {
+            finishCommand();
+            return;
+        }
+
         if (board.getPhase() == Phase.ACTIVATION && currentPlayer != null) {
             int step = board.getStep();
             if (step >= 0 && step < Player.NO_REGISTERS) {
@@ -228,7 +238,6 @@ public class GameController {
 
                 finishCommand();
 
-
             } else {
                 // this should not happen
                 assert false;
@@ -241,6 +250,7 @@ public class GameController {
 
     private void finishCommand() {
         int nextPlayerNumber = board.getPlayerNumber(board.getCurrentPlayer()) + 1;
+
         if (nextPlayerNumber < board.getPlayersNumber()) {
             board.setCurrentPlayer(board.getPlayer(nextPlayerNumber));
         } else {
@@ -295,7 +305,7 @@ public class GameController {
     }
 
     public void moveForward(@NotNull Player player, Heading heading) {
-        if (player.board == board) {
+        if (player.board == board && !player.isRebooting()) {
             Space source = player.getSpace();
             Space destination = board.getNeighbour(source, heading);
 
@@ -323,11 +333,6 @@ public class GameController {
         if (other != null) {
 
             Space otherDestination = board.getNeighbour(destination, heading);
-            if (otherDestination == board.getDeadSpace()) {
-                handleReboot(other);
-                player.setSpace(destination);
-                return;
-            }
 
             if (moveCount <= board.getPlayersNumber() && !otherDestination.getWalls().contains(heading.opposing())) {
 
@@ -362,7 +367,6 @@ public class GameController {
         }
 
 
-
     }
 
     public void fastForward(@NotNull Player player) {
@@ -393,6 +397,8 @@ public class GameController {
             return false;
         }
     }
+
+
 
     class ImpossibleMoveException extends Exception {
 

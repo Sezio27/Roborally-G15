@@ -50,7 +50,6 @@ public class ConveyorBelt extends FieldAction {
         this.heading = heading;
     }
 
-
     public Space getTarget() {
         return target;
     };
@@ -66,6 +65,7 @@ public class ConveyorBelt extends FieldAction {
             return notOccupied && reachable;
         }
 
-        return false;
+        //Meaning it has moved the player outside board
+        return true;
     }
 }
