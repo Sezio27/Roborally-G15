@@ -109,7 +109,7 @@ public class AppController implements Observer {
      */
     private String selectBoard(String[] boards) {
 
-        if (boards == null) {
+        if (boards == null || boards.length == 0) {
             showAlert("No tracks");
             return null;
         }
