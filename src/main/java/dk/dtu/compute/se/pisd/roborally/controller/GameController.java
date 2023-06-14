@@ -22,6 +22,9 @@
 package dk.dtu.compute.se.pisd.roborally.controller;
 
 import dk.dtu.compute.se.pisd.roborally.model.*;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -109,9 +112,14 @@ public class GameController {
         player.setSpawnSpace(space);
     }
 
-    // Currently only prints out who won the game
+    //Now gives a proper alert to the user that the game as ended.
     public void handleWin(@NotNull Player player) {
-        System.out.println(player.getName() + " has won!");
+        System.out.println("Player "+player.getName()+" has won!");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("WIN!");
+        alert.setContentText("Player "+player.getName()+" has won!\nExiting game now!");
+        alert.showAndWait();
+        Platform.exit();
     }
 
     /**
