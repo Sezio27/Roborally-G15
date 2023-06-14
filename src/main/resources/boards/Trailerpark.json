@@ -20,6 +20,19 @@
     },
     {
       "walls": [
+      ],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.Gear",
+        "INSTANCE": {
+          "clockwise": true
+        }
+      },
+      "x": 0,
+      "y": 2
+    },
+    {
+      "walls": [
         "NORTH",
         "SOUTH",
         "EAST"
