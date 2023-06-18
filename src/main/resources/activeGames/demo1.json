@@ -139,6 +139,9 @@
           "visible": true
         },
         {
+          "card": {
+            "command": "LEFT"
+          },
           "visible": true
         },
         {
@@ -215,12 +218,21 @@
           "visible": true
         },
         {
+          "card": {
+            "command": "RIGHT"
+          },
           "visible": true
         },
         {
+          "card": {
+            "command": "LEFT"
+          },
           "visible": true
         },
         {
+          "card": {
+            "command": "FAST_FORWARD"
+          },
           "visible": true
         },
         {
