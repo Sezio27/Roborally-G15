@@ -122,7 +122,7 @@
       "cards": [
         {
           "card": {
-            "command": "FAST_FORWARD"
+            "command": "FORWARD"
           },
           "visible": true
         },
