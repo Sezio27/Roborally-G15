@@ -174,8 +174,11 @@
       "heading": "EAST",
       "program": [
         {
+          "visible": true
+        },
+        {
           "card": {
-            "command": "FORWARD"
+            "command": "LEFT"
           },
           "visible": true
         },
@@ -186,9 +189,9 @@
           "visible": true
         },
         {
-          "visible": true
-        },
-        {
+          "card": {
+            "command": "FORWARD"
+          },
           "visible": true
         },
         {
@@ -251,7 +254,7 @@
       "color": "orange",
       "space": {
         "x": 7,
-        "y": 0
+        "y": 1
       },
       "heading": "SOUTH",
       "program": [
