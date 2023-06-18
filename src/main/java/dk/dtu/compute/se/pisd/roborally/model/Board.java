@@ -308,13 +308,17 @@ public class Board extends Subject {
      * @return a String representing the current status of the game
      */
     public String getStatusMessage() {
-
-        return  "Map: " + boardName +
+        return
+         "Map: " + boardName +
                 ", phase: " + getPhase().name() +
                 ", Player = " + getCurrentPlayer().getName() +
                 ", Step: " + getStep() +
                 ", current checkpoint: " + getCurrentPlayer().getCurrentCheckpoint();
+
+
     }
+
+
 
     public void setMap(String m) {
         map = m;

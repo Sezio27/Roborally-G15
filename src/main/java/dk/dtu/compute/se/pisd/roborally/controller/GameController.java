@@ -247,11 +247,7 @@ public class GameController {
 
             if (belt.doAction(this, source)) {
                 Space destination = belt.getTarget();
-                if (destination == null || destination == board.getDeadSpace()) {
-                    handleReboot(player);
-                } else {
-                    destinationMap.computeIfAbsent(destination, k -> new ArrayList<>()).add(player);
-                }
+                destinationMap.computeIfAbsent(destination, k -> new ArrayList<>()).add(player);
             }
         }
 
@@ -262,7 +258,12 @@ public class GameController {
                 .forEach(entry -> {
                     Player player = entry.getValue().get(0);
                     Space destination = entry.getKey();
-                    player.setSpace(destination);
+                    Space source = player.getSpace();
+                    try {
+                        moveToSpace(player, player.getSpace(), destination, source.getActionType(ConveyorBelt.class).getHeading(),1);
+                    } catch (ImpossibleMoveException e) {
+                        System.out.println(e);
+                    }
                 });
     }
 
