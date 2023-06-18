@@ -35,6 +35,7 @@ public class CommandCardField extends Subject {
     final public Player player;
     @Expose
     private CommandCard card;
+    @Expose
     private boolean visible;
     /**
      * Constructs a CommandCardField for the specified Player.
