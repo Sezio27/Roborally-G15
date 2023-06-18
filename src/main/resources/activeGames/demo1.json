@@ -19,25 +19,25 @@
           "card": {
             "command": "OPTION_LEFT_RIGHT"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "FAST_FORWARD"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "OPTION_LEFT_RIGHT"
           },
-          "visible": false
+          "visible": true
         }
       ],
       "cards": [
@@ -54,6 +54,9 @@
           "visible": true
         },
         {
+          "card": {
+            "command": "FORWARD"
+          },
           "visible": true
         },
         {
@@ -98,28 +101,40 @@
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
+          "visible": true
         },
         {
-          "visible": false
+          "visible": true
         }
       ],
       "cards": [
         {
           "card": {
             "command": "FAST_FORWARD"
+          },
+          "visible": true
+        },
+        {
+          "card": {
+            "command": "LEFT"
+          },
+          "visible": true
+        },
+        {
+          "card": {
+            "command": "FORWARD"
           },
           "visible": true
         },
@@ -140,15 +155,9 @@
         },
         {
           "visible": true
-        },
-        {
-          "visible": true
-        },
-        {
-          "visible": true
         }
       ],
-      "currentCheckpoint": 0,
+      "currentCheckpoint": 3,
       "spawnSpace": {
         "x": 0,
         "y": 1
@@ -174,7 +183,7 @@
           "card": {
             "command": "RIGHT"
           },
-          "visible": false
+          "visible": true
         },
         {
           "visible": true
@@ -203,15 +212,27 @@
           "visible": true
         },
         {
+          "card": {
+            "command": "FORWARD"
+          },
           "visible": true
         },
         {
+          "card": {
+            "command": "RIGHT"
+          },
           "visible": true
         },
         {
+          "card": {
+            "command": "LEFT"
+          },
           "visible": true
         },
         {
+          "card": {
+            "command": "FAST_FORWARD"
+          },
           "visible": true
         },
         {
@@ -244,29 +265,32 @@
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "LEFT"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "OPTION_LEFT_RIGHT"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
+          "visible": true
         }
       ],
       "cards": [
         {
+          "card": {
+            "command": "FORWARD"
+          },
           "visible": true
         },
         {
@@ -323,29 +347,32 @@
           "card": {
             "command": "RIGHT"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "LEFT"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
+          "visible": true
         }
       ],
       "cards": [
         {
+          "card": {
+            "command": "FORWARD"
+          },
           "visible": true
         },
         {
@@ -403,25 +430,25 @@
         "card": {
           "command": "OPTION_LEFT_RIGHT"
         },
-        "visible": false
+        "visible": true
       },
       {
         "card": {
           "command": "FAST_FORWARD"
         },
-        "visible": false
+        "visible": true
       },
       {
         "card": {
           "command": "FORWARD"
         },
-        "visible": false
+        "visible": true
       },
       {
         "card": {
           "command": "OPTION_LEFT_RIGHT"
         },
-        "visible": false
+        "visible": true
       }
     ],
     "cards": [
@@ -438,6 +465,9 @@
         "visible": true
       },
       {
+        "card": {
+          "command": "FORWARD"
+        },
         "visible": true
       },
       {

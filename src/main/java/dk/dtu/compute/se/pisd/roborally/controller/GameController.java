@@ -343,8 +343,8 @@ public class GameController {
             board.setCurrentPlayer(board.getPlayer(nextPlayerNumber));
         } else {
             int nextStep = board.getStep() + 1;
+            executeFieldActions();
             if (nextStep < Player.NO_REGISTERS) {
-                executeFieldActions();
                 makeProgramFieldsVisible(nextStep);
                 board.setStep(nextStep);
                 board.setCurrentPlayer(board.getPlayer(0));
