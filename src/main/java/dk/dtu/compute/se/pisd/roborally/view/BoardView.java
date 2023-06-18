@@ -61,7 +61,9 @@ public class BoardView extends VBox implements ViewObserver {
     private Label phaseInfo;
     private Label stepInfo;
     private List<Integer> playerCheckpoints = new ArrayList<>();
+    private List<Boolean> playerRebooting = new ArrayList<>();
     private HBox checkPointBox;
+    private HBox rebootingBox;
 
     private SpaceEventHandler spaceEventHandler;
 
@@ -91,6 +93,7 @@ public class BoardView extends VBox implements ViewObserver {
 
         statusBox = new VBox();
         checkPointBox = new HBox();
+        rebootingBox = new HBox();
         createStatusBox();
 
         this.getChildren().add(statusBox);
@@ -102,16 +105,23 @@ public class BoardView extends VBox implements ViewObserver {
 
     public void createStatusBox() {
         checkPointBox.getChildren().add(new Label("Reached Checkpoint:"));
+        rebootingBox.getChildren().add(new Label(("Rebooting:\t\t  ")));
         String playerNames = "";
         for (Player player : board.getPlayers()) {
+
             playerCheckpoints.add(player.getCurrentCheckpoint());
-            playerNames += "\t" + player.getName();
             checkPointBox.getChildren().add(new Label("\t" + player.getCurrentCheckpoint() + " \t"));
+            playerRebooting.add(false);
+            rebootingBox.getChildren().add((new Label("\t" + "-" + "\t")));
+
+            playerNames += "\t" + player.getName();
         }
 
         Label boardName = new Label("Map name:\t" + board.getMap());
         Label boardCheckpoints = new Label("Checkpoints:\t" + board.getNumberOfCheckpoints());
         Label players = new Label("\t\t\t\t" + playerNames);
+
+
         phase = board.getPhase();
         phaseInfo = new Label("Phase:\t" + phase);
         step = board.getStep();
@@ -122,6 +132,7 @@ public class BoardView extends VBox implements ViewObserver {
         statusBox.getChildren().add(phaseInfo);
         statusBox.getChildren().add(players);
         statusBox.getChildren().add(checkPointBox);
+        statusBox.getChildren().add(rebootingBox);
         statusBox.getChildren().add(stepInfo);
     }
 
@@ -136,27 +147,37 @@ public class BoardView extends VBox implements ViewObserver {
         int currentStep = board.getStep();
         if (step != currentStep) {
             stepInfo = new Label("Step:\t" + currentStep);
-            statusBox.getChildren().set(5, stepInfo);
+            statusBox.getChildren().set(6, stepInfo);
             step = currentStep;
         }
 
-        //Update checkpoints
         boolean updatedCheckpoint = false;
+        boolean playerReboot = false;
         for (int i = 0; i < board.getPlayersNumber(); i++) {
+
             int playerCheckpoint = board.getPlayer(i).getCurrentCheckpoint();
             if (playerCheckpoint != playerCheckpoints.get(i)) {
-                System.out.println(board.getPlayer(i).getName() + " " + board.getPlayer(i).getCurrentCheckpoint());
-                System.out.println(playerCheckpoint);
                 checkPointBox.getChildren().set(i + 1, new Label("\t" + playerCheckpoint + " \t"));
                 playerCheckpoints.set(i, playerCheckpoint);
                 updatedCheckpoint = true;
             }
+
+            if (board.getPlayer(i).isRebooting() && !playerRebooting.get(i)) {
+                rebootingBox.getChildren().set(i+1, new Label("\tY\t"));
+                playerRebooting.set(i, true);
+                playerReboot = true;
+            }
+
+            if (board.getPhase() == Phase.PROGRAMMING) {
+                rebootingBox.getChildren().set(i+1, new Label("\t-\t"));
+                playerReboot = true;
+            }
         }
 
-        if (updatedCheckpoint) {
-            System.out.println("yes");
-            statusBox.getChildren().set(4, checkPointBox);
-        }
+
+        if (updatedCheckpoint) statusBox.getChildren().set(4, checkPointBox);
+        if (playerReboot) statusBox.getChildren().set(5, rebootingBox);
+
     }
 
 

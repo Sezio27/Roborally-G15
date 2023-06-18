@@ -136,7 +136,6 @@ public class SpaceView extends StackPane implements ViewObserver {
             }
             line.setFill(Color.DARKGOLDENROD);
             wallViews.put(wallDirection, line);
-            System.out.println("wall added");
             this.getChildren().add(line);
         }
     }

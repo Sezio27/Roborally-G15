@@ -4,11 +4,26 @@
       "name": "Player 1",
       "color": "red",
       "space": {
-        "x": 5,
-        "y": 1
+        "x": 4,
+        "y": 2
       },
-      "heading": "SOUTH",
+      "heading": "EAST",
       "program": [
+        {
+          "card": {
+            "command": "FORWARD"
+          },
+          "visible": true
+        },
+        {
+          "visible": true
+        },
+        {
+          "card": {
+            "command": "FAST_FORWARD"
+          },
+          "visible": true
+        },
         {
           "card": {
             "command": "FORWARD"
@@ -19,25 +34,7 @@
           "card": {
             "command": "OPTION_LEFT_RIGHT"
           },
-          "visible": false
-        },
-        {
-          "card": {
-            "command": "FAST_FORWARD"
-          },
-          "visible": false
-        },
-        {
-          "card": {
-            "command": "FORWARD"
-          },
-          "visible": false
-        },
-        {
-          "card": {
-            "command": "OPTION_LEFT_RIGHT"
-          },
-          "visible": false
+          "visible": true
         }
       ],
       "cards": [
@@ -54,9 +51,15 @@
           "visible": true
         },
         {
+          "card": {
+            "command": "FORWARD"
+          },
           "visible": true
         },
         {
+          "card": {
+            "command": "FAST_FORWARD"
+          },
           "visible": true
         },
         {
@@ -98,28 +101,37 @@
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
+          "visible": true
+        },
+        {
+          "visible": true
         },
         {
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
-        },
-        {
-          "visible": false
+          "visible": true
         }
       ],
       "cards": [
         {
           "card": {
             "command": "FAST_FORWARD"
+          },
+          "visible": true
+        },
+        {
+          "visible": true
+        },
+        {
+          "card": {
+            "command": "FORWARD"
           },
           "visible": true
         },
@@ -130,82 +142,9 @@
           "visible": true
         },
         {
-          "visible": true
-        },
-        {
-          "visible": true
-        },
-        {
-          "visible": true
-        },
-        {
-          "visible": true
-        },
-        {
-          "visible": true
-        },
-        {
-          "visible": true
-        }
-      ],
-      "currentCheckpoint": 0,
-      "spawnSpace": {
-        "x": 0,
-        "y": 1
-      },
-      "rebooting": false
-    },
-    {
-      "name": "Player 3",
-      "color": "blue",
-      "space": {
-        "x": 5,
-        "y": 5
-      },
-      "heading": "EAST",
-      "program": [
-        {
           "card": {
             "command": "FORWARD"
           },
-          "visible": true
-        },
-        {
-          "card": {
-            "command": "RIGHT"
-          },
-          "visible": false
-        },
-        {
-          "visible": true
-        },
-        {
-          "visible": true
-        },
-        {
-          "visible": true
-        }
-      ],
-      "cards": [
-        {
-          "visible": true
-        },
-        {
-          "card": {
-            "command": "FORWARD"
-          },
-          "visible": true
-        },
-        {
-          "card": {
-            "command": "FAST_FORWARD"
-          },
-          "visible": true
-        },
-        {
-          "visible": true
-        },
-        {
           "visible": true
         },
         {
@@ -221,6 +160,88 @@
       "currentCheckpoint": 3,
       "spawnSpace": {
         "x": 0,
+        "y": 1
+      },
+      "rebooting": false
+    },
+    {
+      "name": "Player 3",
+      "color": "blue",
+      "space": {
+        "x": 4,
+        "y": 5
+      },
+      "heading": "EAST",
+      "program": [
+        {
+          "card": {
+            "command": "FORWARD"
+          },
+          "visible": true
+        },
+        {
+          "visible": true
+        },
+        {
+          "visible": true
+        },
+        {
+          "visible": true
+        },
+        {
+          "card": {
+            "command": "OPTION_LEFT_RIGHT"
+          },
+          "visible": true
+        }
+      ],
+      "cards": [
+        {
+          "card": {
+            "command": "RIGHT"
+          },
+          "visible": true
+        },
+        {
+          "card": {
+            "command": "FORWARD"
+          },
+          "visible": true
+        },
+        {
+          "visible": true
+        },
+        {
+          "card": {
+            "command": "FORWARD"
+          },
+          "visible": true
+        },
+        {
+          "card": {
+            "command": "RIGHT"
+          },
+          "visible": true
+        },
+        {
+          "card": {
+            "command": "FORWARD"
+          },
+          "visible": true
+        },
+        {
+          "visible": true
+        },
+        {
+          "card": {
+            "command": "OPTION_LEFT_RIGHT"
+          },
+          "visible": true
+        }
+      ],
+      "currentCheckpoint": 3,
+      "spawnSpace": {
+        "x": 0,
         "y": 2
       },
       "rebooting": false
@@ -230,43 +251,46 @@
       "color": "orange",
       "space": {
         "x": 7,
-        "y": 0
+        "y": 1
       },
       "heading": "SOUTH",
       "program": [
         {
           "card": {
-            "command": "RIGHT"
+            "command": "FORWARD"
           },
           "visible": true
         },
         {
           "card": {
-            "command": "LEFT"
+            "command": "FORWARD"
           },
-          "visible": false
-        },
-        {
-          "card": {
-            "command": "LEFT"
-          },
-          "visible": false
+          "visible": true
         },
         {
           "card": {
             "command": "OPTION_LEFT_RIGHT"
           },
-          "visible": false
+          "visible": true
+        },
+        {
+          "card": {
+            "command": "OPTION_LEFT_RIGHT"
+          },
+          "visible": true
         },
         {
           "card": {
             "command": "FORWARD"
           },
-          "visible": false
+          "visible": true
         }
       ],
       "cards": [
         {
+          "card": {
+            "command": "FORWARD"
+          },
           "visible": true
         },
         {
@@ -303,85 +327,6 @@
         "y": 3
       },
       "rebooting": false
-    },
-    {
-      "name": "Player 5",
-      "color": "grey",
-      "space": {
-        "x": 3,
-        "y": 6
-      },
-      "heading": "EAST",
-      "program": [
-        {
-          "card": {
-            "command": "FORWARD"
-          },
-          "visible": true
-        },
-        {
-          "card": {
-            "command": "RIGHT"
-          },
-          "visible": false
-        },
-        {
-          "card": {
-            "command": "FORWARD"
-          },
-          "visible": false
-        },
-        {
-          "card": {
-            "command": "LEFT"
-          },
-          "visible": false
-        },
-        {
-          "card": {
-            "command": "FORWARD"
-          },
-          "visible": false
-        }
-      ],
-      "cards": [
-        {
-          "visible": true
-        },
-        {
-          "card": {
-            "command": "RIGHT"
-          },
-          "visible": true
-        },
-        {
-          "card": {
-            "command": "FORWARD"
-          },
-          "visible": true
-        },
-        {
-          "visible": true
-        },
-        {
-          "visible": true
-        },
-        {
-          "visible": true
-        },
-        {
-          "visible": true
-        },
-        {
-          "visible": true
-        }
-      ],
-      "currentCheckpoint": 1,
-      "spawnSpace": {
-        "x": 0,
-        "y": 4
-      },
-      "rebooting": false
     }
   ],
   "current": {
@@ -403,25 +348,25 @@
         "card": {
           "command": "OPTION_LEFT_RIGHT"
         },
-        "visible": false
+        "visible": true
       },
       {
         "card": {
           "command": "FAST_FORWARD"
         },
-        "visible": false
+        "visible": true
       },
       {
         "card": {
           "command": "FORWARD"
         },
-        "visible": false
+        "visible": true
       },
       {
         "card": {
           "command": "OPTION_LEFT_RIGHT"
         },
-        "visible": false
+        "visible": true
       }
     ],
     "cards": [
@@ -438,6 +383,9 @@
         "visible": true
       },
       {
+        "card": {
+          "command": "FORWARD"
+        },
         "visible": true
       },
       {
@@ -482,10 +430,6 @@
     {
       "x": 0,
       "y": 3
-    },
-    {
-      "x": 0,
-      "y": 4
     }
   ],
   "map": "demo"

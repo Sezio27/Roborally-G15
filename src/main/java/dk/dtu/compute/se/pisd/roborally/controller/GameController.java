@@ -251,7 +251,6 @@ public class GameController {
             }
         }
 
-
         //Only move players with unique destinations
         destinationMap.entrySet().stream()
                 .filter(entry -> entry.getValue().size() == 1)
@@ -459,7 +458,9 @@ public class GameController {
 
             Space otherDestination = board.getNeighbour(destination, heading);
 
-            if (moveCount <= board.getPlayersNumber() && !otherDestination.getWalls().contains(heading.opposing())) {
+            if (moveCount <= board.getPlayersNumber()
+                    && !destination.getWalls().contains(heading)
+                    && !otherDestination.getWalls().contains(heading.opposing())) {
 
                 moveToSpace(other, destination, otherDestination, heading, moveCount + 1);
 
