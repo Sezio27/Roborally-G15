@@ -30,6 +30,19 @@
     },
     {
       "walls": [
+      ],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.Gear",
+        "INSTANCE": {
+          "clockwise": true
+        }
+      },
+      "x": 0,
+      "y": 2
+    },
+    {
+      "walls": [
         "NORTH"
       ],
       "action":
@@ -285,6 +298,19 @@
     ,
       "x": 7,
       "y": 2
+    },
+    {
+      "walls": [
+      ],
+      "action":
+      {
+        "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.Gear",
+        "INSTANCE": {
+          "clockwise": true
+        }
+      },
+      "x": 7,
+      "y": 3
     },
     {
       "walls": [

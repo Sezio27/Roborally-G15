@@ -31,26 +31,37 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * ...
  *
  * @author Ekkart Kindler, ekki@dtu.dk
- *
  */
 public class BoardView extends VBox implements ViewObserver {
 
     private Board board;
+    private Phase phase;
+    private int step;
+    private int round;
+
 
     private GridPane mainBoardPane;
     private SpaceView[][] spaces;
     private SpaceView deadSpace;
-
     private PlayersView playersView;
 
-    private Label statusLabel;
+    private VBox statusBox;
+    private Label phaseInfo;
+    private Label stepInfo;
+    private List<Integer> playerCheckpoints = new ArrayList<>();
+    private HBox checkPointBox;
 
     private SpaceEventHandler spaceEventHandler;
 
@@ -59,11 +70,10 @@ public class BoardView extends VBox implements ViewObserver {
 
         mainBoardPane = new GridPane();
         playersView = new PlayersView(gameController);
-        statusLabel = new Label("<no status>");
 
         this.getChildren().add(mainBoardPane);
         this.getChildren().add(playersView);
-        this.getChildren().add(statusLabel);
+
 
         spaces = new SpaceView[board.width][board.height];
 
@@ -78,16 +88,82 @@ public class BoardView extends VBox implements ViewObserver {
                 spaceView.setOnMouseClicked(spaceEventHandler);
             }
         }
+
+        statusBox = new VBox();
+        checkPointBox = new HBox();
+        createStatusBox();
+
+        this.getChildren().add(statusBox);
+
         deadSpace = new SpaceView(board.getDeadSpace());
         board.attach(this);
         update(board);
     }
 
+    public void createStatusBox() {
+        checkPointBox.getChildren().add(new Label("Reached Checkpoint:"));
+        String playerNames = "";
+        for (Player player : board.getPlayers()) {
+            playerCheckpoints.add(player.getCurrentCheckpoint());
+            playerNames += "\t" + player.getName();
+            checkPointBox.getChildren().add(new Label("\t" + player.getCurrentCheckpoint() + " \t"));
+        }
+
+        Label boardName = new Label("Map name:\t" + board.getMap());
+        Label boardCheckpoints = new Label("Checkpoints:\t" + board.getNumberOfCheckpoints());
+        Label players = new Label("\t\t\t\t" + playerNames);
+        phase = board.getPhase();
+        phaseInfo = new Label("Phase:\t" + phase);
+        step = board.getStep();
+        stepInfo = new Label("Step:\t" + step);
+
+        statusBox.getChildren().add(boardName);
+        statusBox.getChildren().add(boardCheckpoints);
+        statusBox.getChildren().add(phaseInfo);
+        statusBox.getChildren().add(players);
+        statusBox.getChildren().add(checkPointBox);
+        statusBox.getChildren().add(stepInfo);
+    }
+
+    public void updateStatus() {
+        Phase currentPhase = board.getPhase();
+        if (phase != currentPhase) {
+            phaseInfo = new Label("Phase:\t" + currentPhase);
+            statusBox.getChildren().set(2, phaseInfo);
+            phase = currentPhase;
+        }
+
+        int currentStep = board.getStep();
+        if (step != currentStep) {
+            stepInfo = new Label("Step:\t" + currentStep);
+            statusBox.getChildren().set(5, stepInfo);
+            step = currentStep;
+        }
+
+        //Update checkpoints
+        boolean updatedCheckpoint = false;
+        for (int i = 0; i < board.getPlayersNumber(); i++) {
+            int playerCheckpoint = board.getPlayer(i).getCurrentCheckpoint();
+            if (playerCheckpoint != playerCheckpoints.get(i)) {
+                System.out.println(board.getPlayer(i).getName() + " " + board.getPlayer(i).getCurrentCheckpoint());
+                System.out.println(playerCheckpoint);
+                checkPointBox.getChildren().set(i + 1, new Label("\t" + playerCheckpoint + " \t"));
+                playerCheckpoints.set(i, playerCheckpoint);
+                updatedCheckpoint = true;
+            }
+        }
+
+        if (updatedCheckpoint) {
+            System.out.println("yes");
+            statusBox.getChildren().set(4, checkPointBox);
+        }
+    }
+
+
     @Override
     public void updateView(Subject subject) {
         if (subject == board) {
-            Phase phase = board.getPhase();
-            statusLabel.setText(board.getStatusMessage());
+            updateStatus();
         }
     }
 
