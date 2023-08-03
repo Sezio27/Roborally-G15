@@ -69,6 +69,10 @@ public class Board extends Subject {
 
     @Expose
     private String map;
+
+    //for online games
+    @Expose
+    private String gameName;
     /**
      * Constructs a new board with the specified dimensions and name.
      *
@@ -335,4 +339,8 @@ public class Board extends Subject {
     public void addSpawnSpace(Space space) {
         spawnSpaces.add(space);
     }
+
+    public void setGameName(String name){gameName = name;}
+    public String getGameName(){return gameName;}
+    public String getBoardName(){return boardName;}
 }

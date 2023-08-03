@@ -223,7 +223,6 @@ public class LoadBoard {
                 }
             }
         }
-
         String filename = BOARDSFOLDER + File.separator + name + "." + JSON_EXT;
 
         GsonBuilder simpleBuilder = new GsonBuilder().
@@ -235,11 +234,11 @@ public class LoadBoard {
     }
     public static void saveCurrentGame(Board board, String name){
         String filename = ACTIVEGAMES + File.separator + name + "." + JSON_EXT;
+        board.setGameName(name);
         GsonBuilder simpleBuilder = new GsonBuilder().
                 excludeFieldsWithoutExposeAnnotation().
                 setPrettyPrinting();
         Gson gson = simpleBuilder.create();
-
         writeFile(board, filename, gson);
     }
 

@@ -42,6 +42,5 @@ public class BoardTemplate {
 
     public List<SpaceTemplate> spawnSpaces = new ArrayList<>();
 
-    public int numberOfCheckPoints;
 
 }
