@@ -6,39 +6,34 @@ import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import dk.dtu.compute.se.pisd.roborally.model.Board;
 import dk.dtu.compute.se.pisd.roborally.model.FieldAction;
+import dk.dtu.compute.se.pisd.roborally.model.Player;
 import org.springframework.stereotype.Service;
 
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 @Service
 public class GameService implements IGameService{
-    ArrayList<String> boards = new ArrayList<String>();
+    ArrayList<String> boards = new ArrayList<>();
     ArrayList<Board> games = new ArrayList<Board>();
 
-    public GameService() throws IOException {
-        boards = new ArrayList<>(List.of(LoadBoard.getTracks()));
+    public GameService() {
+        boards.addAll(Arrays.asList(LoadBoard.getTracks()));
     }
 
     @Override
     public List<String> findAllBoards() {
+
         return boards;
     }
 
     @Override
     public List<Board> findAllGames() {
         for(String name : LoadBoard.getActiveGames()) {
-            GsonBuilder simpleBuilder = new GsonBuilder().
-                    registerTypeAdapter(FieldAction.class, new Adapter<FieldAction>())
-                    .excludeFieldsWithoutExposeAnnotation();
-            Gson gson = simpleBuilder.create();
-
-            String jsonString = gson.toJson(LoadBoard.loadActiveBoard(name));
-            Board board = gson.fromJson(jsonString, Board.class);
-
-            games.add(board);
+            games.add(recursionDeleter(LoadBoard.loadActiveBoard(name)));
         }
         return games;
     }
@@ -57,7 +52,11 @@ public class GameService implements IGameService{
     public Board getBoardByName(String name) {
         for(String mapName : boards) {
             if(mapName.equals(name)) {
-                return LoadBoard.loadBoard(mapName);
+                Board temp = LoadBoard.loadBoard(mapName);
+                Player p = new Player(temp,"blue","temp");
+                temp.addPlayer(p);
+                temp.setCurrentPlayer(p);
+                return recursionDeleter(temp);
             }
         }
         return null;
@@ -78,4 +77,13 @@ public class GameService implements IGameService{
     public boolean deleteGameByName(String name) {
         return false;
     }
+
+    public Board recursionDeleter(Board b) {
+        GsonBuilder simpleBuilder = new GsonBuilder().
+                registerTypeAdapter(FieldAction.class, new Adapter<FieldAction>())
+                .excludeFieldsWithoutExposeAnnotation();
+        Gson gson = simpleBuilder.create();
+        return gson.fromJson(gson.toJson(b), Board.class);
+    }
+
 }
